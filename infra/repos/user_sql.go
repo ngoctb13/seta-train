@@ -32,3 +32,9 @@ func (u *userSQLRepo) GetUserByEmail(ctx context.Context, email string) (*models
 	err := u.db.First(&user, "email = ?", email).Error
 	return &user, err
 }
+
+func (u *userSQLRepo) GetAllUsers(ctx context.Context) ([]*models.User, error) {
+	var users []*models.User
+	err := u.db.Find(&users).Error
+	return users, err
+}
