@@ -17,6 +17,7 @@ func NewUser(userRepo repos.IUserRepo) *User {
 	}
 }
 
+// Todo: if have error, should log before return error
 func (u *User) CreateUser(ctx context.Context, user *models.User) error {
 	return u.userRepo.CreateUser(ctx, user)
 }

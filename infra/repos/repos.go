@@ -7,7 +7,8 @@ import (
 )
 
 type Repo struct {
-	db  *gorm.DB
+	db *gorm.DB
+	// no need config here
 	cfg *config.PostgresConfig
 }
 

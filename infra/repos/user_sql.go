@@ -17,6 +17,9 @@ func NewUserSQLRepo(db *gorm.DB) *userSQLRepo {
 	}
 }
 
+// Todo: should pass ctx when querying the database
+// For that, we can trace, close follow ctx
+// But no need to pass ctx for eveytime, cause sometime, if ctx close, still need to query the database
 func (u *userSQLRepo) CreateUser(ctx context.Context, user *models.User) error {
 	return u.db.Create(user).Error
 }

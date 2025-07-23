@@ -1,3 +1,4 @@
+# Todo: optional in normal, i just create a file config.yaml in same folder config.go to store config and parse environment variables
 db:
   driver_name: ${DB_DRIVER_NAME}
   data_source: ${DB_DATA_SOURCE}

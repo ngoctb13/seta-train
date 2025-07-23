@@ -36,11 +36,14 @@ func Load(filePath string) (*AppConfig, error) {
 		filePath,
 	}
 
+	// Todo: create one object log for all application, no need to create new logger for each function
+	// more info: should use zap instead zap.Sugar for better performance
 	sugar := zap.S().With(fields...)
 
 	sugar.Debug("Load config...")
 	zap.S().Debugf("CONFIG_FILE=%v", filePath)
 
+	// Todo os.ReadFile
 	configBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		sugar.Error("Failed to load config file")

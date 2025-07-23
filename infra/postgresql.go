@@ -56,7 +56,9 @@ func CreateDBAndMigrate(cfg *config.PostgresConfig, migrationFile string) *gorm.
 		panic(err)
 	}
 
+	// Todo: already connected to db, no need to connect again in Migrate function
 	Migrate(migrationFile, cfg.MigrationConnURL)
+	// base on signal shutdown, we can close the db connection
 	return db
 }
 
@@ -65,6 +67,7 @@ func Migrate(source string, connStr string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
+	// use log instead of fmt
 	fmt.Println("Migrating....")
 	fmt.Printf("Source=%+v Connection=%+v\n", source, connStr)
 
