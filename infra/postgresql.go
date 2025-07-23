@@ -94,7 +94,7 @@ func Migrate(source string, connStr string) {
 		panic(err)
 	}
 
-	if dirty {
+	if dirty && version > 0 {
 		_ = mg.Force(int(version) - 1) // force to clean state
 	}
 
