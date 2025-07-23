@@ -6,33 +6,72 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ngoctb13/seta-train/handler/gql/user/generated"
 	"github.com/ngoctb13/seta-train/handler/gql/user/model"
+	"github.com/ngoctb13/seta-train/internal/auth"
 	"github.com/ngoctb13/seta-train/internal/models"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.UserInput) (*models.User, error) {
-	user := &models.User{
-		Username: input.Name,
-		Email:    input.Email,
-	}
-	err := r.Resolver.UserUsecase.CreateUser(ctx, user)
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (bool, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return nil, err
+		return false, err
 	}
-	return user, nil
+	user := &models.User{
+		Username:     input.Username,
+		Email:        input.Email,
+		PasswordHash: string(hash),
+		Role:         string(input.Role),
+	}
+	err = r.Resolver.UserUsecase.CreateUser(ctx, user)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
-// GetListUser is the resolver for the GetListUser field.
-func (r *queryResolver) GetListUser(ctx context.Context) ([]*models.User, error) {
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (string, error) {
+	user, err := r.Resolver.UserUsecase.GetUserByEmail(ctx, input.Email)
+	if err != nil {
+		return "", err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(input.Password))
+	if err != nil {
+		return "", fmt.Errorf("invalid email or password")
+	}
+
+	token, err := auth.GenerateJWT(user.UserID, user.Role)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	// Nếu dùng JWT thì logout chỉ là phía client xóa token
+	return true, nil
+}
+
+// FetchUsers is the resolver for the fetchUsers field.
+func (r *queryResolver) FetchUsers(ctx context.Context) ([]*models.User, error) {
 	return r.Resolver.UserUsecase.GetAllUsers(ctx)
 }
 
-// GetUserByID is the resolver for the GetUserByID field.
-func (r *queryResolver) GetUserByID(ctx context.Context, id string) (*models.User, error) {
-	return r.Resolver.UserUsecase.GetUserByID(ctx, id)
+// Userid is the resolver for the userid field.
+func (r *userResolver) Userid(ctx context.Context, obj *models.User) (string, error) {
+	return obj.UserID, nil
+}
+
+// Role is the resolver for the role field.
+func (r *userResolver) Role(ctx context.Context, obj *models.User) (model.Role, error) {
+	return model.Role(obj.Role), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
@@ -41,5 +80,21 @@ func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResol
 // Query returns generated.QueryResolver implementation.
 func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 
+// User returns generated.UserResolver implementation.
+func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) Me(ctx context.Context) (*models.User, error) {
+	panic(fmt.Errorf("not implemented: Me - me"))
+}
+*/

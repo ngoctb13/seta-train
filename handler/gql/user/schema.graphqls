@@ -1,19 +1,33 @@
-type User {
-  id: ID!
-  username: String!
-  email: String!
+enum Role {
+  MANAGER
+  MEMBER
 }
 
-input UserInput {
-  name: String!
+type User {
+  userid: ID!
+  username: String!
   email: String!
+  role: Role!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+  role: Role!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
 }
 
 type Query {
-  GetListUser: [User!]!
-  GetUserByID(id: ID!): User
+  fetchUsers: [User!]!
 }
 
 type Mutation {
-  createUser(input: UserInput!): User!
+  createUser(input: CreateUserInput!): Boolean!
+  login(input: LoginInput!): String!
+  logout: Boolean!
 }
