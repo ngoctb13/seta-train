@@ -1,3 +1,5 @@
+directive @auth on FIELD_DEFINITION
+
 enum Role {
   MANAGER
   MEMBER
@@ -23,7 +25,7 @@ input LoginInput {
 }
 
 type Query {
-  fetchUsers: [User!]!
+  fetchUsers: [User!]! @auth
 }
 
 type Mutation {

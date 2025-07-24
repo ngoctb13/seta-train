@@ -45,6 +45,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Auth func(ctx context.Context, obj any, next graphql.Resolver) (res any, err error)
 }
 
 type ComplexityRoot struct {
@@ -61,7 +62,7 @@ type ComplexityRoot struct {
 	User struct {
 		Email    func(childComplexity int) int
 		Role     func(childComplexity int) int
-		Userid   func(childComplexity int) int
+		UserID   func(childComplexity int) int
 		Username func(childComplexity int) int
 	}
 }
@@ -75,8 +76,6 @@ type QueryResolver interface {
 	FetchUsers(ctx context.Context) ([]*models.User, error)
 }
 type UserResolver interface {
-	Userid(ctx context.Context, obj *models.User) (string, error)
-
 	Role(ctx context.Context, obj *models.User) (model.Role, error)
 }
 
@@ -152,11 +151,11 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		return e.complexity.User.Role(childComplexity), true
 
 	case "User.userid":
-		if e.complexity.User.Userid == nil {
+		if e.complexity.User.UserID == nil {
 			break
 		}
 
-		return e.complexity.User.Userid(childComplexity), true
+		return e.complexity.User.UserID(childComplexity), true
 
 	case "User.username":
 		if e.complexity.User.Username == nil {
@@ -272,7 +271,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../schema.graphqls", Input: `enum Role {
+	{Name: "../schema.graphqls", Input: `directive @auth on FIELD_DEFINITION
+
+enum Role {
   MANAGER
   MEMBER
 }
@@ -297,7 +298,7 @@ input LoginInput {
 }
 
 type Query {
-  fetchUsers: [User!]!
+  fetchUsers: [User!]! @auth
 }
 
 type Mutation {
@@ -683,8 +684,30 @@ func (ec *executionContext) _Query_fetchUsers(ctx context.Context, field graphql
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().FetchUsers(rctx)
+		directive0 := func(rctx context.Context) (any, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().FetchUsers(rctx)
+		}
+
+		directive1 := func(ctx context.Context) (any, error) {
+			if ec.directives.Auth == nil {
+				var zeroVal []*models.User
+				return zeroVal, errors.New("directive auth is not implemented")
+			}
+			return ec.directives.Auth(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.([]*models.User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be []*github.com/ngoctb13/seta-train/internal/models.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -869,7 +892,7 @@ func (ec *executionContext) _User_userid(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (any, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Userid(rctx, obj)
+		return obj.UserID, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -890,8 +913,8 @@ func (ec *executionContext) fieldContext_User_userid(_ context.Context, field gr
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
 		},
@@ -3219,41 +3242,10 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
 		case "userid":
-			field := field
-
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._User_userid(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
-				return res
+			out.Values[i] = ec._User_userid(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
 			}
-
-			if field.Deferrable != nil {
-				dfs, ok := deferred[field.Deferrable.Label]
-				di := 0
-				if ok {
-					dfs.AddField(field)
-					di = len(dfs.Values) - 1
-				} else {
-					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
-					deferred[field.Deferrable.Label] = dfs
-				}
-				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
-					return innerFunc(ctx, dfs)
-				})
-
-				// don't run the out.Concurrently() call below
-				out.Values[i] = graphql.Null
-				continue
-			}
-
-			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "username":
 			out.Values[i] = ec._User_username(ctx, field, obj)
 			if out.Values[i] == graphql.Null {

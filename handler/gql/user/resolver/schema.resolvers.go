@@ -64,11 +64,6 @@ func (r *queryResolver) FetchUsers(ctx context.Context) ([]*models.User, error) 
 	return r.Resolver.UserUsecase.GetAllUsers(ctx)
 }
 
-// Userid is the resolver for the userid field.
-func (r *userResolver) Userid(ctx context.Context, obj *models.User) (string, error) {
-	return obj.UserID, nil
-}
-
 // Role is the resolver for the role field.
 func (r *userResolver) Role(ctx context.Context, obj *models.User) (model.Role, error) {
 	return model.Role(obj.Role), nil
@@ -86,15 +81,3 @@ func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) Me(ctx context.Context) (*models.User, error) {
-	panic(fmt.Errorf("not implemented: Me - me"))
-}
-*/
