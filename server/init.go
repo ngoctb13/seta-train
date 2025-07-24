@@ -5,11 +5,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/ngoctb13/seta-train/handler/gql/user/directive"
+	"github.com/ngoctb13/seta-train/handler/gql/user"
 	usergqlgenerated "github.com/ngoctb13/seta-train/handler/gql/user/generated"
 	usergqlresolver "github.com/ngoctb13/seta-train/handler/gql/user/resolver"
 	hdl "github.com/ngoctb13/seta-train/handler/rest"
 	"github.com/ngoctb13/seta-train/infra/repos"
+	"github.com/ngoctb13/seta-train/internal/auth"
 	"github.com/ngoctb13/seta-train/internal/domains/user/usecases"
 )
 
@@ -45,9 +46,10 @@ func (s *Server) initGqlRoute(domains *domains) {
 			UserUsecase: domains.user,
 		},
 		Directives: usergqlgenerated.DirectiveRoot{
-			Auth: directive.AuthDirective,
+			Auth: user.AuthDirective,
 		},
 	}))
+
 	s.router.POST("/graphql", func(c *gin.Context) {
 		gqlHandler.ServeHTTP(c.Writer, c.Request)
 	})
@@ -60,6 +62,7 @@ func (s *Server) initRestRoute(domains *domains) {
 	handler := hdl.NewHandler(domains.user)
 
 	routerAuth := s.router.Group("v1")
+	routerAuth.Use(auth.AuthMiddleware())
 	handler.ConfigAuthRouteAPI(routerAuth)
 }
 

@@ -49,3 +49,24 @@ func GetUserIDFromToken(tokenString string) (string, error) {
 	}
 	return userID, nil
 }
+
+// ParseAndValidateJWT parse JWT, xác thực, và trả về userID, role nếu hợp lệ
+func ParseAndValidateJWT(tokenString string) (string, string, error) {
+	if tokenString == "" {
+		return "", "", errors.New("empty token")
+	}
+	// Nếu token có tiền tố "Bearer ", loại bỏ nó
+	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
+		tokenString = tokenString[7:]
+	}
+	claims, err := ParseJWT(tokenString)
+	if err != nil {
+		return "", "", err
+	}
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return "", "", errors.New("user_id not found in token")
+	}
+	role, _ := claims["role"].(string)
+	return userID, role, nil
+}
