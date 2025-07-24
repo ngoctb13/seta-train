@@ -28,3 +28,7 @@ func (u *User) GetUserByID(ctx context.Context, id string) (*models.User, error)
 func (u *User) GetAllUsers(ctx context.Context) ([]*models.User, error) {
 	return u.userRepo.GetAllUsers(ctx)
 }
+
+func (u *User) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	return u.userRepo.GetUserByEmail(ctx, email)
+}

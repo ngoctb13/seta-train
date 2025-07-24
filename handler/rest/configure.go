@@ -16,4 +16,5 @@ func NewHandler(user *usecases.User) *Handler {
 }
 
 func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
+	router.GET("/hello", h.HelloHandler())
 }
