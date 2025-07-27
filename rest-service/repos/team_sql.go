@@ -33,3 +33,32 @@ func (t *teamSQLRepo) AddTeamManager(ctx context.Context, teamManager *model.Tea
 	err := t.db.Create(teamManager).Error
 	return err
 }
+
+func (t *teamSQLRepo) IsMainUserManager(ctx context.Context, teamID, userID string) (bool, error) {
+	var count int64
+	err := t.db.Model(&model.TeamManager{}).
+		Where("team_id = ? AND user_id = ? AND is_main_manager = ?", teamID, userID, true).
+		Count(&count).Error
+	return count > 0, err
+}
+
+func (t *teamSQLRepo) IsUserManager(ctx context.Context, teamID, userID string) (bool, error) {
+	var count int64
+	err := t.db.Model(&model.TeamManager{}).
+		Where("team_id = ? AND user_id = ?", teamID, userID).
+		Count(&count).Error
+	return count > 0, err
+}
+
+func (t *teamSQLRepo) IsUserMember(ctx context.Context, teamID, userID string) (bool, error) {
+	var count int64
+	err := t.db.Model(&model.TeamMember{}).
+		Where("team_id = ? AND user_id = ?", teamID, userID).
+		Count(&count).Error
+	return count > 0, err
+}
+
+func (t *teamSQLRepo) AddTeamMember(ctx context.Context, teamMember *model.TeamMember) error {
+	err := t.db.Create(teamMember).Error
+	return err
+}

@@ -9,7 +9,6 @@ import (
 
 var jwtSecret = []byte("your-secret-key")
 
-// GenerateJWT sinh ra JWT cho userID
 func GenerateJWT(userID string, role string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
@@ -20,7 +19,6 @@ func GenerateJWT(userID string, role string) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-// ParseJWT xác thực và trả về claims nếu hợp lệ
 func ParseJWT(tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -37,7 +35,6 @@ func ParseJWT(tokenString string) (jwt.MapClaims, error) {
 	return nil, errors.New("invalid token")
 }
 
-// GetUserIDFromToken lấy userID từ JWT
 func GetUserIDFromToken(tokenString string) (string, error) {
 	claims, err := ParseJWT(tokenString)
 	if err != nil {
@@ -50,12 +47,10 @@ func GetUserIDFromToken(tokenString string) (string, error) {
 	return userID, nil
 }
 
-// ParseAndValidateJWT parse JWT, xác thực, và trả về userID, role nếu hợp lệ
 func ParseAndValidateJWT(tokenString string) (string, string, error) {
 	if tokenString == "" {
 		return "", "", errors.New("empty token")
 	}
-	// Nếu token có tiền tố "Bearer ", loại bỏ nó
 	if len(tokenString) > 7 && tokenString[:7] == "Bearer " {
 		tokenString = tokenString[7:]
 	}

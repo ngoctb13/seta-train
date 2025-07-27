@@ -10,6 +10,7 @@ import (
 	"github.com/ngoctb13/seta-train/rest-service/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/infra"
+	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
 	"go.uber.org/zap"
 )
 
@@ -34,8 +35,9 @@ func (s *Server) Init() {
 		panic(err)
 	}
 
+	txnHelper := transaction.NewGormTxnManager(db)
 	repo := repos.NewSQLRepo(db, s.cfg.DB)
-	domains := s.initDomains(repo)
+	domains := s.initDomains(repo, txnHelper)
 	s.initCORS()
 	s.initRouter(domains)
 }

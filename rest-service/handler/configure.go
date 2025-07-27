@@ -21,4 +21,6 @@ func NewHandler(user *user_usecases.User, team *team_usecases.Team) *Handler {
 func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
 	router.GET("/hello", h.HelloHandler())
 	router.POST("/teams", h.CreateTeamHandler())
+	router.POST("/teams/:teamId/members", h.AddTeamMembersHandler())
+	router.POST("/teams/:teamId/managers", h.AddTeamManagersHandler())
 }

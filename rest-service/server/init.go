@@ -7,6 +7,7 @@ import (
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
 	user_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
 	"github.com/ngoctb13/seta-train/rest-service/repos"
+	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
 )
 
 type domains struct {
@@ -29,9 +30,9 @@ func (s *Server) initCORS() {
 	s.router.Use(cors.New(corsConfig))
 }
 
-func (s *Server) initDomains(repo repos.IRepo) *domains {
+func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
 	user := user_usecases.NewUser(repo.Users())
-	team := team_usecases.NewTeam(repo.Teams())
+	team := team_usecases.NewTeam(repo.Teams(), txn)
 	return &domains{
 		user: user,
 		team: team,
