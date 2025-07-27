@@ -1,0 +1,9 @@
+package model
+
+type User struct {
+	ID           string `gorm:"column:userid;default:uuid_generate_v4()"`
+	Username     string `gorm:"column:username"`
+	Email        string `gorm:"column:email"`
+	PasswordHash string `gorm:"column:passwordhash"`
+	Role         string `gorm:"column:role"`
+}

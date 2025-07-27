@@ -1,0 +1,47 @@
+enum Role {
+  MANAGER
+  MEMBER
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  password: String!
+  role: Role!
+}
+
+type AuthPayload {
+  token: String!
+}
+
+input CreateUserInput {
+  username: String!
+  email: String!
+  password: String!
+  role: Role!
+}
+
+input AssignRoleInput {
+  userId: ID!
+  role: Role!
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+type Query {
+  fetchUsers: [User!]! @auth(role: MANAGER)
+  verifyToken(token: String!): User
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
+  login(input: LoginInput!): AuthPayload!
+  logout: Boolean! @auth
+  assignRole(input: AssignRoleInput!): User! @auth(role: MANAGER)
+}
+
+directive @auth(role: Role) on FIELD_DEFINITION

@@ -1,0 +1,77 @@
+package main
+
+import (
+	"flag"
+	"log"
+	"net/http"
+
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/lru"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/ngoctb13/seta-train/auth-service/graph"
+	"github.com/ngoctb13/seta-train/auth-service/internal/auth"
+	"github.com/ngoctb13/seta-train/auth-service/internal/domains/user/usecases"
+	"github.com/ngoctb13/seta-train/auth-service/repos"
+	"github.com/ngoctb13/seta-train/shared-modules/config"
+	"github.com/ngoctb13/seta-train/shared-modules/infra"
+	"github.com/ngoctb13/seta-train/shared-modules/setting"
+	"github.com/vektah/gqlparser/v2/ast"
+	"go.uber.org/zap"
+)
+
+func main() {
+
+	var configFile, port string
+	flag.StringVar(&configFile, "config-file", "", "Specify config file path")
+	flag.StringVar(&port, "port", "", "Specify port")
+	flag.Parse()
+
+	defer setting.WaitOSSignal()
+
+	cfg, err := config.Load(configFile)
+	if err != nil {
+		zap.S().Errorf("load config fail with err: %v", err)
+		panic(err)
+	}
+
+	// connect to db
+	go setting.ConnectDatabase(cfg.DB)
+
+	db, err := infra.InitPostgres(cfg.DB)
+	if err != nil {
+		zap.S().Errorf("Init db error: %v", err)
+		panic(err)
+	}
+
+	repos := repos.NewSQLRepo(db, cfg.DB)
+	userRepo := repos.Users()
+	userUsecase := usecases.NewUser(userRepo)
+
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{
+		Resolvers: &graph.Resolver{
+			UserUsecase: userUsecase,
+		},
+		Directives: graph.DirectiveRoot{
+			Auth: graph.AuthDirective,
+		},
+	}))
+
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.AddTransport(transport.POST{})
+
+	srv.SetQueryCache(lru.New[*ast.QueryDocument](1000))
+
+	srv.Use(extension.Introspection{})
+	srv.Use(extension.AutomaticPersistedQuery{
+		Cache: lru.New[string](100),
+	})
+
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", auth.AuthContextMiddleware(srv))
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}
