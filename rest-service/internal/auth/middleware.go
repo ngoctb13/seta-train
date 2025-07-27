@@ -16,8 +16,6 @@ const (
 	userRoleKey = "userRole"
 )
 
-// UserInfo là struct nhận về từ auth-service
-// Có thể điều chỉnh theo response thực tế của auth-service
 type UserInfo struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`

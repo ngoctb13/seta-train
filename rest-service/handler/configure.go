@@ -2,19 +2,23 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
+	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
+	user_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
 )
 
 type Handler struct {
-	user *usecases.User
+	user *user_usecases.User
+	team *team_usecases.Team
 }
 
-func NewHandler(user *usecases.User) *Handler {
+func NewHandler(user *user_usecases.User, team *team_usecases.Team) *Handler {
 	return &Handler{
 		user: user,
+		team: team,
 	}
 }
 
 func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
 	router.GET("/hello", h.HelloHandler())
+	router.POST("/teams", h.CreateTeamHandler())
 }

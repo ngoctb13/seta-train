@@ -4,12 +4,14 @@ import (
 	"github.com/gin-contrib/cors"
 	hdl "github.com/ngoctb13/seta-train/rest-service/handler"
 	"github.com/ngoctb13/seta-train/rest-service/internal/auth"
-	"github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
+	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
+	user_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
 	"github.com/ngoctb13/seta-train/rest-service/repos"
 )
 
 type domains struct {
-	user *usecases.User
+	user *user_usecases.User
+	team *team_usecases.Team
 }
 
 func (s *Server) initCORS() {
@@ -28,14 +30,16 @@ func (s *Server) initCORS() {
 }
 
 func (s *Server) initDomains(repo repos.IRepo) *domains {
-	user := usecases.NewUser(repo.Users())
+	user := user_usecases.NewUser(repo.Users())
+	team := team_usecases.NewTeam(repo.Teams())
 	return &domains{
 		user: user,
+		team: team,
 	}
 }
 
 func (s *Server) initRestRoute(domains *domains) {
-	handler := hdl.NewHandler(domains.user)
+	handler := hdl.NewHandler(domains.user, domains.team)
 
 	routerAuth := s.router.Group("v1")
 	routerAuth.Use(auth.AuthMiddleware())
