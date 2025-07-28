@@ -2,7 +2,6 @@ package repos
 
 import (
 	teamRepo "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/repos"
-	userRepo "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"gorm.io/gorm"
 )
@@ -17,10 +16,6 @@ func NewSQLRepo(db *gorm.DB, cfg *config.PostgresConfig) IRepo {
 		db:  db,
 		cfg: cfg,
 	}
-}
-
-func (r *Repo) Users() userRepo.IUserRepo {
-	return NewUserSQLRepo(r.db)
 }
 
 func (r *Repo) Teams() teamRepo.ITeamRepo {

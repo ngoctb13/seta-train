@@ -5,13 +5,11 @@ import (
 	hdl "github.com/ngoctb13/seta-train/rest-service/handler"
 	"github.com/ngoctb13/seta-train/rest-service/internal/auth"
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
-	user_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
 	"github.com/ngoctb13/seta-train/rest-service/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
 )
 
 type domains struct {
-	user *user_usecases.User
 	team *team_usecases.Team
 }
 
@@ -31,16 +29,14 @@ func (s *Server) initCORS() {
 }
 
 func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
-	user := user_usecases.NewUser(repo.Users())
 	team := team_usecases.NewTeam(repo.Teams(), txn)
 	return &domains{
-		user: user,
 		team: team,
 	}
 }
 
 func (s *Server) initRestRoute(domains *domains) {
-	handler := hdl.NewHandler(domains.user, domains.team)
+	handler := hdl.NewHandler(domains.team)
 
 	routerAuth := s.router.Group("v1")
 	routerAuth.Use(auth.AuthMiddleware())

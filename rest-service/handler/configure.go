@@ -3,17 +3,14 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
-	user_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/user/usecases"
 )
 
 type Handler struct {
-	user *user_usecases.User
 	team *team_usecases.Team
 }
 
-func NewHandler(user *user_usecases.User, team *team_usecases.Team) *Handler {
+func NewHandler(team *team_usecases.Team) *Handler {
 	return &Handler{
-		user: user,
 		team: team,
 	}
 }
