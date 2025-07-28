@@ -51,7 +51,7 @@ func (h *Handler) AddTeamMembersHandler() gin.HandlerFunc {
 		role, ok := c.Get(userRoleKey)
 		userID, _ := c.Get(userIDKey)
 		if !ok || role != managerRole {
-			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can create team"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can do"})
 			return
 		}
 
@@ -89,7 +89,7 @@ func (h *Handler) AddTeamManagersHandler() gin.HandlerFunc {
 		role, ok := c.Get(userRoleKey)
 		userID, _ := c.Get(userIDKey)
 		if !ok || role != managerRole {
-			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can create team"})
+			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can do"})
 			return
 		}
 
@@ -119,5 +119,79 @@ func (h *Handler) AddTeamManagersHandler() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, gin.H{"message": "Managers added successfully"})
+	}
+}
+
+func (h *Handler) RemoveTeamMemberHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, ok := c.Get(userRoleKey)
+		userID, _ := c.Get(userIDKey)
+		if !ok || role != managerRole {
+			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can do"})
+			return
+		}
+
+		teamID := c.Param("teamId")
+		if teamID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "team ID is required"})
+			return
+		}
+
+		memberID := c.Param("memberId")
+		if memberID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "member ID is required"})
+			return
+		}
+
+		err := h.team.RemoveTeamMember(c, &useCaseModel.RemoveTeamMemberInput{
+			TeamID:    teamID,
+			MemberID:  memberID,
+			CurUserID: userID.(string),
+		})
+
+		if err != nil {
+			log.Printf("RemoveTeamMember usecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Member removed successfully"})
+	}
+}
+
+func (h *Handler) RemoveTeamManagerHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		role, ok := c.Get(userRoleKey)
+		userID, _ := c.Get(userIDKey)
+		if !ok || role != managerRole {
+			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can create team"})
+			return
+		}
+
+		teamID := c.Param("teamId")
+		if teamID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "team ID is required"})
+			return
+		}
+
+		managerID := c.Param("managerId")
+		if managerID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "manager ID is required"})
+			return
+		}
+
+		err := h.team.RemoveTeamManager(c, &useCaseModel.RemoveTeamManagerInput{
+			CurUserID: userID.(string),
+			TeamID:    teamID,
+			ManagerID: managerID,
+		})
+
+		if err != nil {
+			log.Printf("RemoveTeamManager usecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Manager removed successfully"})
 	}
 }

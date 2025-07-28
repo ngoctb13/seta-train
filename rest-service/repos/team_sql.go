@@ -29,8 +29,14 @@ func (t *teamSQLRepo) GetAllTeams(ctx context.Context) ([]*model.Team, error) {
 	err := t.db.Find(&teams).Error
 	return teams, err
 }
+
 func (t *teamSQLRepo) AddTeamManager(ctx context.Context, teamManager *model.TeamManager) error {
 	err := t.db.Create(teamManager).Error
+	return err
+}
+
+func (t *teamSQLRepo) RemoveTeamManager(ctx context.Context, teamManager *model.TeamManager) error {
+	err := t.db.Delete(teamManager).Error
 	return err
 }
 
@@ -60,5 +66,10 @@ func (t *teamSQLRepo) IsUserMember(ctx context.Context, teamID, userID string) (
 
 func (t *teamSQLRepo) AddTeamMember(ctx context.Context, teamMember *model.TeamMember) error {
 	err := t.db.Create(teamMember).Error
+	return err
+}
+
+func (t *teamSQLRepo) RemoveTeamMember(ctx context.Context, teamMember *model.TeamMember) error {
+	err := t.db.Delete(teamMember).Error
 	return err
 }

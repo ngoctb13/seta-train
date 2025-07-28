@@ -121,3 +121,75 @@ func (t *Team) AddTeamManagers(ctx context.Context, input *model.AddTeamManagers
 		return nil
 	})
 }
+
+func (t *Team) RemoveTeamMember(ctx context.Context, input *model.RemoveTeamMemberInput) error {
+	return t.txn.WithTransaction(ctx, func(tx *gorm.DB) error {
+		team, err := t.teamRepo.GetTeamByID(ctx, input.TeamID)
+		if err != nil {
+			return err
+		}
+
+		if team.ID == "" {
+			return ErrTeamNotFound
+		}
+
+		isManager, err := t.teamRepo.IsUserManager(ctx, input.TeamID, input.CurUserID)
+		if err != nil {
+			return err
+		}
+
+		if !isManager {
+			return ErrUserNotManager
+		}
+
+		isMember, _ := t.teamRepo.IsUserMember(ctx, input.TeamID, input.MemberID)
+		if !isMember {
+			return ErrUserNotMember
+		}
+
+		teamMember := sharedModel.TeamMember{
+			TeamID: input.TeamID,
+			UserID: input.MemberID,
+		}
+		err = t.teamRepo.RemoveTeamMember(ctx, &teamMember)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
+
+func (t *Team) RemoveTeamManager(ctx context.Context, input *model.RemoveTeamManagerInput) error {
+	return t.txn.WithTransaction(ctx, func(tx *gorm.DB) error {
+		team, err := t.teamRepo.GetTeamByID(ctx, input.TeamID)
+		if err != nil {
+			return err
+		}
+
+		if team.ID == "" {
+			return ErrTeamNotFound
+		}
+
+		isMainManager, err := t.teamRepo.IsMainUserManager(ctx, input.TeamID, input.CurUserID)
+		if err != nil {
+			return err
+		}
+
+		if !isMainManager {
+			return ErrUserNotMainManager
+		}
+
+		teamManager := sharedModel.TeamManager{
+			TeamID:        input.TeamID,
+			UserID:        input.ManagerID,
+			IsMainManager: false,
+		}
+		err = t.teamRepo.RemoveTeamManager(ctx, &teamManager)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+}
