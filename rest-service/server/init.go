@@ -13,6 +13,7 @@ import (
 type domains struct {
 	team   *team_usecases.Team
 	folder *folder_usecases.Folder
+	note   *folder_usecases.Note
 }
 
 func (s *Server) initCORS() {
@@ -33,14 +34,16 @@ func (s *Server) initCORS() {
 func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
 	team := team_usecases.NewTeam(repo.Teams(), txn)
 	folder := folder_usecases.NewFolder(repo.Folders(), repo.Notes(), txn)
+	note := folder_usecases.NewNote(repo.Notes(), repo.Folders(), txn)
 	return &domains{
 		team:   team,
 		folder: folder,
+		note:   note,
 	}
 }
 
 func (s *Server) initRestRoute(domains *domains) {
-	handler := hdl.NewHandler(domains.team, domains.folder)
+	handler := hdl.NewHandler(domains.team, domains.folder, domains.note)
 
 	routerAuth := s.router.Group("v1")
 	routerAuth.Use(auth.AuthMiddleware())
