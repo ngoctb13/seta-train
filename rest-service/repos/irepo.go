@@ -8,4 +8,5 @@ import (
 type IRepo interface {
 	Teams() teamRepo.ITeamRepo
 	Folders() folderRepo.IFolderRepo
+	Notes() folderRepo.INoteRepo
 }

@@ -36,8 +36,7 @@ func (t *teamSQLRepo) AddTeamManager(ctx context.Context, teamManager *model.Tea
 }
 
 func (t *teamSQLRepo) RemoveTeamManager(ctx context.Context, teamManager *model.TeamManager) error {
-	err := t.db.Delete(teamManager).Error
-	return err
+	return t.db.Where("team_id = ? AND user_id = ?", teamManager.TeamID, teamManager.UserID).Delete(&model.TeamManager{}).Error
 }
 
 func (t *teamSQLRepo) IsMainUserManager(ctx context.Context, teamID, userID string) (bool, error) {
@@ -70,6 +69,5 @@ func (t *teamSQLRepo) AddTeamMember(ctx context.Context, teamMember *model.TeamM
 }
 
 func (t *teamSQLRepo) RemoveTeamMember(ctx context.Context, teamMember *model.TeamMember) error {
-	err := t.db.Delete(teamMember).Error
-	return err
+	return t.db.Where("team_id = ? AND user_id = ?", teamMember.TeamID, teamMember.UserID).Delete(&model.TeamMember{}).Error
 }

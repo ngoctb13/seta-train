@@ -26,3 +26,7 @@ func (r *Repo) Teams() teamRepo.ITeamRepo {
 func (r *Repo) Folders() folderRepo.IFolderRepo {
 	return NewFolderSQLRepo(r.db)
 }
+
+func (r *Repo) Notes() folderRepo.INoteRepo {
+	return NewNoteSQLRepo(r.db)
+}

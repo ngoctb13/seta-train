@@ -8,4 +8,7 @@ import (
 
 type IFolderRepo interface {
 	CreateFolder(ctx context.Context, folder *model.Folder) error
+	GetFolderByID(ctx context.Context, id string) (*model.Folder, error)
+	UpdateFolder(ctx context.Context, folder *model.Folder) error
+	DeleteFolder(ctx context.Context, id string) error
 }

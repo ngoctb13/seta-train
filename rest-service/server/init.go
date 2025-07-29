@@ -32,7 +32,7 @@ func (s *Server) initCORS() {
 
 func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
 	team := team_usecases.NewTeam(repo.Teams(), txn)
-	folder := folder_usecases.NewFolder(repo.Folders(), txn)
+	folder := folder_usecases.NewFolder(repo.Folders(), repo.Notes(), txn)
 	return &domains{
 		team:   team,
 		folder: folder,
