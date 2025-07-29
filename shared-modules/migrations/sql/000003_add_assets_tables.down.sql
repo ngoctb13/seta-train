@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS note_shares;
+DROP TABLE IF EXISTS folder_shares;
+DROP TABLE IF EXISTS notes;
+DROP TABLE IF EXISTS folders;
+DROP TYPE IF EXISTS access_type;
