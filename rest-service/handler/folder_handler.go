@@ -117,3 +117,66 @@ func (h *Handler) DeleteFolderHandler() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"message": "Folder deleted successfully"})
 	}
 }
+
+func (h *Handler) ShareFolderHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		folderID := c.Param("folderId")
+		if folderID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
+		}
+
+		var req models.ShareFolderRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			log.Printf("binding json error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		userID, _ := c.Get(userIDKey)
+
+		err := h.folder.ShareFolder(c, &useCaseModel.ShareFolderInput{
+			FolderID:      folderID,
+			CurUserID:     userID.(string),
+			SharedUserIDs: req.UserIDs,
+			AccessType:    req.AccessType,
+		})
+
+		if err != nil {
+			log.Printf("ShareFolderUsecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Folder shared successfully"})
+	}
+}
+
+func (h *Handler) RevokeSharingFolderHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		folderID := c.Param("folderId")
+		if folderID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
+		}
+
+		sharedUserID := c.Param("userId")
+		if sharedUserID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "shared user ID is required"})
+		}
+
+		userID, _ := c.Get(userIDKey)
+
+		err := h.folder.RevokeSharingFolder(c, &useCaseModel.RevokeSharingFolderInput{
+			CurUserID:    userID.(string),
+			FolderID:     folderID,
+			SharedUserID: sharedUserID,
+		})
+
+		if err != nil {
+			log.Printf("RevokeSharingFolderUsecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Folder sharing revoked successfully"})
+	}
+}

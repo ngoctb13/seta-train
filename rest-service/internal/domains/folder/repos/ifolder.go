@@ -11,4 +11,7 @@ type IFolderRepo interface {
 	GetFolderByID(ctx context.Context, id string) (*model.Folder, error)
 	UpdateFolder(ctx context.Context, folder *model.Folder) error
 	DeleteFolder(ctx context.Context, id string) error
+	GetFolderShare(ctx context.Context, folderID string, userID string) (*model.FolderShare, error)
+	CreateFolderShare(ctx context.Context, share *model.FolderShare) error
+	DeleteFolderShare(ctx context.Context, share *model.FolderShare) error
 }

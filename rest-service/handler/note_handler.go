@@ -122,3 +122,66 @@ func (h *Handler) DeleteNoteHandler() gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{"message": "Note deleted successfully"})
 	}
 }
+
+func (h *Handler) ShareNoteHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		noteID := c.Param("noteId")
+		if noteID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
+		}
+
+		var req models.ShareNoteRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			log.Printf("binding json error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		userID, _ := c.Get(userIDKey)
+
+		err := h.note.ShareNote(c, &useCaseModel.ShareNoteInput{
+			NoteID:        noteID,
+			CurUserID:     userID.(string),
+			SharedUserIDs: req.SharedUserIDs,
+			AccessType:    req.AccessType,
+		})
+
+		if err != nil {
+			log.Printf("ShareNoteUsecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Note shared successfully"})
+	}
+}
+
+func (h *Handler) RevokeSharingNoteHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		noteID := c.Param("noteId")
+		if noteID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
+		}
+
+		sharedUserID := c.Param("userId")
+		if sharedUserID == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "shared user ID is required"})
+		}
+
+		userID, _ := c.Get(userIDKey)
+
+		err := h.note.RevokeSharingNote(c, &useCaseModel.RevokeSharingNoteInput{
+			CurUserID:    userID.(string),
+			NoteID:       noteID,
+			SharedUserID: sharedUserID,
+		})
+
+		if err != nil {
+			log.Printf("RevokeSharingNoteUsecase fail with error: %v", err)
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"message": "Note sharing revoked successfully"})
+	}
+}

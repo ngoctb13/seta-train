@@ -39,3 +39,19 @@ func (n *noteSQLRepo) UpdateNote(ctx context.Context, note *model.Note) error {
 	err := n.db.Save(note).Error
 	return err
 }
+
+func (n *noteSQLRepo) GetNoteShare(ctx context.Context, noteID string, userID string) (*model.NoteShare, error) {
+	var noteShare model.NoteShare
+	err := n.db.Where("note_id = ? AND shared_with_user_id = ?", noteID, userID).First(&noteShare).Error
+	return &noteShare, err
+}
+
+func (n *noteSQLRepo) CreateNoteShare(ctx context.Context, share *model.NoteShare) error {
+	err := n.db.Create(share).Error
+	return err
+}
+
+func (n *noteSQLRepo) DeleteNoteShare(ctx context.Context, share *model.NoteShare) error {
+	err := n.db.Where("note_id = ? AND shared_with_user_id = ?", share.NoteID, share.SharedWithUserID).Delete(&model.NoteShare{}).Error
+	return err
+}

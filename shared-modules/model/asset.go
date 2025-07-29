@@ -33,3 +33,14 @@ type NoteShare struct {
 	SharedWithUserID string     `gorm:"column:shared_with_user_id"`
 	AccessType       AccessType `gorm:"column:access_type"`
 }
+
+func ToAccessType(accessType string) AccessType {
+	switch accessType {
+	case "read":
+		return AccessRead
+	case "write":
+		return AccessWrite
+	default:
+		return AccessRead
+	}
+}

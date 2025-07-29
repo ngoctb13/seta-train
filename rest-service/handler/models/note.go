@@ -26,3 +26,8 @@ func ToNoteUseCaseModel(notes []Note) []useCaseModel.Note {
 	}
 	return useCaseNotes
 }
+
+type ShareNoteRequest struct {
+	SharedUserIDs []string `json:"shared_user_ids"`
+	AccessType    string   `json:"access_type"`
+}

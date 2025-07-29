@@ -34,3 +34,19 @@ func (f *folderSQLRepo) UpdateFolder(ctx context.Context, folder *model.Folder) 
 func (f *folderSQLRepo) DeleteFolder(ctx context.Context, id string) error {
 	return f.db.Where("id = ?", id).Delete(&model.Folder{}).Error
 }
+
+func (f *folderSQLRepo) GetFolderShare(ctx context.Context, folderID string, userID string) (*model.FolderShare, error) {
+	var folderShare model.FolderShare
+	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", folderID, userID).Find(&folderShare).Error
+	return &folderShare, err
+}
+
+func (f *folderSQLRepo) CreateFolderShare(ctx context.Context, share *model.FolderShare) error {
+	err := f.db.Create(share).Error
+	return err
+}
+
+func (f *folderSQLRepo) DeleteFolderShare(ctx context.Context, share *model.FolderShare) error {
+	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", share.FolderID, share.SharedWithUserID).Delete(&model.FolderShare{}).Error
+	return err
+}

@@ -41,4 +41,10 @@ func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
 	router.GET("/notes/:noteId", h.ViewNoteHandler())
 	router.PUT("/notes/:noteId", h.UpdateNoteHandler())
 	router.DELETE("/notes/:noteId", h.DeleteNoteHandler())
+
+	// sharing routes
+	router.POST("/folders/:folderId/share", h.ShareFolderHandler())
+	router.POST("/notes/:noteId/share", h.ShareNoteHandler())
+	router.DELETE("/folders/:folderId/share/:userId", h.RevokeSharingFolderHandler())
+	router.DELETE("/notes/:noteId/share/:userId", h.RevokeSharingNoteHandler())
 }

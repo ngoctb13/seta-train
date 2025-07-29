@@ -45,8 +45,17 @@ func (f *Folder) GetFolderDetails(ctx context.Context, input *model.GetFolderDet
 		return nil, err
 	}
 
-	if folder.OwnerID != input.UserID {
-		return nil, errors.New("user is not the owner of the folder")
+	if folder.ID == "" {
+		return nil, ErrFolderNotFound
+	}
+
+	folderShare, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, input.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if folder.OwnerID != input.UserID || folderShare.ID == "" {
+		return nil, ErrFolderNotSharedToUser
 	}
 
 	return folder, nil
@@ -58,8 +67,12 @@ func (f *Folder) UpdateFolder(ctx context.Context, input *model.UpdateFolderInpu
 		return err
 	}
 
+	if folder.ID == "" {
+		return ErrFolderNotFound
+	}
+
 	if folder.OwnerID != input.UserID {
-		return errors.New("user is not the owner of the folder")
+		return ErrUserNotFolderOwner
 	}
 
 	folder.Name = input.FolderName
@@ -72,6 +85,10 @@ func (f *Folder) DeleteFolder(ctx context.Context, input *model.DeleteFolderInpu
 		folder, err := f.folderRepo.GetFolderByID(ctx, input.FolderID)
 		if err != nil {
 			return err
+		}
+
+		if folder.ID == "" {
+			return ErrFolderNotFound
 		}
 
 		if folder.OwnerID != input.UserID {
@@ -93,4 +110,74 @@ func (f *Folder) DeleteFolder(ctx context.Context, input *model.DeleteFolderInpu
 		err = f.folderRepo.DeleteFolder(ctx, input.FolderID)
 		return err
 	})
+}
+
+func (f *Folder) ShareFolder(ctx context.Context, input *model.ShareFolderInput) error {
+	folder, err := f.folderRepo.GetFolderByID(ctx, input.FolderID)
+	if err != nil {
+		return err
+	}
+
+	if folder.ID == "" {
+		return ErrFolderNotFound
+	}
+
+	if folder.OwnerID != input.CurUserID {
+		return ErrUserNotFolderOwner
+	}
+
+	for _, userID := range input.SharedUserIDs {
+		folderShare, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, userID)
+		if err != nil {
+			return err
+		}
+
+		if folderShare != nil {
+			continue
+		}
+
+		newShare := &sharedModel.FolderShare{
+			FolderID:         input.FolderID,
+			SharedWithUserID: userID,
+			AccessType:       sharedModel.ToAccessType(input.AccessType),
+		}
+
+		err = f.folderRepo.CreateFolderShare(ctx, newShare)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (f *Folder) RevokeSharingFolder(ctx context.Context, input *model.RevokeSharingFolderInput) error {
+	folder, err := f.folderRepo.GetFolderByID(ctx, input.FolderID)
+	if err != nil {
+		return err
+	}
+
+	if folder.ID == "" {
+		return ErrFolderNotFound
+	}
+
+	if folder.OwnerID != input.CurUserID {
+		return ErrUserNotFolderOwner
+	}
+
+	folderShare, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, input.SharedUserID)
+	if err != nil {
+		return err
+	}
+
+	if folderShare.ID == "" {
+		return ErrFolderNotSharedToUser
+	}
+
+	err = f.folderRepo.DeleteFolderShare(ctx, folderShare)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
