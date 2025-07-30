@@ -8,6 +8,7 @@ import (
 	"github.com/ngoctb13/seta-train/auth-service/graph/model"
 	"github.com/ngoctb13/seta-train/auth-service/internal/auth"
 	"github.com/ngoctb13/seta-train/auth-service/internal/domains/user/usecases"
+	"github.com/ngoctb13/seta-train/shared-modules/logger"
 )
 
 // This file will not be regenerated automatically.
@@ -16,6 +17,7 @@ import (
 
 type Resolver struct {
 	UserUsecase *usecases.User
+	Logger      *logger.Logger
 }
 
 func AuthDirective(ctx context.Context, obj interface{}, next graphql.Resolver, role *model.Role) (interface{}, error) {

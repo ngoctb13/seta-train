@@ -28,7 +28,6 @@ func (h *Handler) CreateTeamHandler() gin.HandlerFunc {
 		var input models.CreateTeamReqeust
 		if err := c.ShouldBindJSON(&input); err != nil {
 			h.logger.Error("Failed to bind JSON for team creation: %v", err)
-			log.Printf("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -39,8 +38,7 @@ func (h *Handler) CreateTeamHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			h.logger.Error("Failed to create team '%s': %v", input.TeamName, err)
-			log.Printf("CreateTeamUsecase fail with error: %v", err)
+			h.logger.Error("CreateTeamUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -70,7 +68,6 @@ func (h *Handler) AddTeamMembersHandler() gin.HandlerFunc {
 		var input models.AddTeamMembersRequest
 		if err := c.ShouldBindJSON(&input); err != nil {
 			h.logger.Error("Failed to bind JSON for adding team members: %v", err)
-			log.Printf("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -82,8 +79,7 @@ func (h *Handler) AddTeamMembersHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			h.logger.Error("Failed to add members to team %s: %v", teamID, err)
-			log.Printf("AddTeamMembers usecase fail with error: %v", err)
+			h.logger.Error("AddTeamMembers usecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}

@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # Grafana - Visualization platform
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -18,7 +17,6 @@ services:
     networks:
       - monitoring
 
-  # Loki - Log aggregation
   loki:
     image: grafana/loki:latest
     container_name: loki
@@ -30,7 +28,6 @@ services:
     networks:
       - monitoring
 
-  # Promtail - Log collection agent
   promtail:
     image: grafana/promtail:latest
     container_name: promtail

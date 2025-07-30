@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	folder_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/folder/usecases"
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
-	"github.com/ngoctb13/seta-train/shared-modules/utils"
+	"github.com/ngoctb13/seta-train/shared-modules/logger"
 )
 
 type Handler struct {
@@ -12,11 +12,10 @@ type Handler struct {
 	folder *folder_usecases.Folder
 	note   *folder_usecases.Note
 	asset  *folder_usecases.Asset
-	logger *utils.Logger
+	logger *logger.Logger
 }
 
-func NewHandler(team *team_usecases.Team, folder *folder_usecases.Folder, note *folder_usecases.Note, asset *folder_usecases.Asset) *Handler {
-	logger := utils.NewLogger("rest-service")
+func NewHandler(team *team_usecases.Team, folder *folder_usecases.Folder, note *folder_usecases.Note, asset *folder_usecases.Asset, logger *logger.Logger) *Handler {
 	return &Handler{
 		team:   team,
 		folder: folder,
