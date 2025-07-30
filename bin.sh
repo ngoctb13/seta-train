@@ -11,9 +11,14 @@ AUTH_PORT="8080"
 REST_PORT="8090"
 
 INFRA_LOCAL_COMPOSE_FILE="$ROOT_DIR/seta-train/build/docker-compose.dev.yaml"
+MONITORING_COMPOSE_FILE="$ROOT_DIR/seta-train/build/docker-compose.monitoring.yaml"
 
 function local_infra() {
   docker-compose -f "$INFRA_LOCAL_COMPOSE_FILE" "$@"
+}
+
+function monitoring() {
+  docker-compose -f "$MONITORING_COMPOSE_FILE" "$@"
 }
 
 function init() {
@@ -46,6 +51,14 @@ function api_start() {
   auth_api_start &
   rest_api_start &
   wait
+}
+
+function monitoring_start() {
+  echo "Starting monitoring stack..."
+  monitoring up -d
+  echo "Monitoring stack started!"
+  echo "Grafana: http://localhost:3000 (admin/admin)"
+  echo "Loki: http://localhost:3100"
 }
 
 function auth_api_start() {
@@ -129,7 +142,26 @@ api)
 migrate)
     migrate_db "${@:2}"
     ;;
+monitoring)
+    case "$2" in
+    start)
+        monitoring_start
+        ;;
+    stop)
+        monitoring down
+        ;;
+    restart)
+        monitoring restart
+        ;;
+    logs)
+        monitoring logs "${@:3}"
+        ;;
+    *)
+        echo "monitoring [start|stop|restart|logs]"
+        ;;
+    esac
+    ;;
 *)
-    echo "./bin.sh [infra|api|migrate|lint|add_version|test]"
+    echo "./bin.sh [infra|api|migrate|monitoring|lint|add_version|test]"
     ;;
 esac

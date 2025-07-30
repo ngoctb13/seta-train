@@ -1,0 +1,77 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "Application Logs Dashboard",
+    "tags": ["logs", "application"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Log Volume by Service",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(rate({job=~\".*\"}[5m])) by (job)",
+            "refId": "A"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "displayMode": "list"
+            }
+          }
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "id": 2,
+        "title": "Recent Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=~\".*\"}",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 12,
+          "x": 12,
+          "y": 0
+        }
+      },
+      {
+        "id": 3,
+        "title": "Error Logs",
+        "type": "logs",
+        "targets": [
+          {
+            "expr": "{job=~\".*\"} |= \"error\"",
+            "refId": "A"
+          }
+        ],
+        "gridPos": {
+          "h": 8,
+          "w": 24,
+          "x": 0,
+          "y": 8
+        }
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s"
+  }
+} 

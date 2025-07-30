@@ -17,6 +17,7 @@ import (
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/infra"
 	"github.com/ngoctb13/seta-train/shared-modules/setting"
+	"github.com/ngoctb13/seta-train/shared-modules/utils"
 	"github.com/vektah/gqlparser/v2/ast"
 	"go.uber.org/zap"
 )
@@ -30,8 +31,12 @@ func main() {
 
 	defer setting.WaitOSSignal()
 
+	// Initialize logger
+	logger := utils.NewLogger("auth-service")
+
 	cfg, err := config.Load(configFile)
 	if err != nil {
+		logger.Error("Failed to load config: %v", err)
 		zap.S().Errorf("load config fail with err: %v", err)
 		panic(err)
 	}
@@ -41,6 +46,7 @@ func main() {
 
 	db, err := infra.InitPostgres(cfg.DB)
 	if err != nil {
+		logger.Error("Failed to initialize database: %v", err)
 		zap.S().Errorf("Init db error: %v", err)
 		panic(err)
 	}

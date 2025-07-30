@@ -8,6 +8,7 @@ import (
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
 	"github.com/ngoctb13/seta-train/rest-service/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
+	"github.com/ngoctb13/seta-train/shared-modules/middleware"
 )
 
 type domains struct {
@@ -47,6 +48,11 @@ func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *doma
 
 func (s *Server) initRestRoute(domains *domains) {
 	handler := hdl.NewHandler(domains.team, domains.folder, domains.note, domains.asset)
+
+	// Add logging middleware
+	loggingMiddleware := middleware.NewLoggingMiddleware("rest-service")
+	s.router.Use(loggingMiddleware.LoggingMiddleware())
+	s.router.Use(loggingMiddleware.ErrorLogging())
 
 	routerAuth := s.router.Group("v1")
 	routerAuth.Use(auth.AuthMiddleware())

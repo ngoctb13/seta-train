@@ -6,6 +6,7 @@ import (
 	"github.com/ngoctb13/seta-train/rest-service/server"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/setting"
+	"github.com/ngoctb13/seta-train/shared-modules/utils"
 	"go.uber.org/zap"
 )
 
@@ -17,9 +18,13 @@ func main() {
 
 	defer setting.WaitOSSignal()
 
+	// Initialize logger
+	logger := utils.NewLogger("rest-service")
+
 	//load config
 	cfg, err := config.Load(configFile)
 	if err != nil {
+		logger.Error("Failed to load config: %v", err)
 		zap.S().Errorf("load config fail with err: %v", err)
 		panic(err)
 	}
@@ -32,6 +37,7 @@ func main() {
 	s.Init()
 
 	if err := s.ListenHTTP(); err != nil {
+		logger.Error("Failed to start server: %v", err)
 		zap.S().Errorf("start server fail with err: %v", err)
 		panic(err)
 	}
