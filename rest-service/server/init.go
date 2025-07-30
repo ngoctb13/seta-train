@@ -14,6 +14,7 @@ type domains struct {
 	team   *team_usecases.Team
 	folder *folder_usecases.Folder
 	note   *folder_usecases.Note
+	asset  *folder_usecases.Asset
 }
 
 func (s *Server) initCORS() {
@@ -35,15 +36,17 @@ func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *doma
 	team := team_usecases.NewTeam(repo.Teams(), txn)
 	folder := folder_usecases.NewFolder(repo.Folders(), repo.Notes(), txn)
 	note := folder_usecases.NewNote(repo.Notes(), repo.Folders(), txn)
+	asset := folder_usecases.NewAsset(repo.Folders(), repo.Notes(), repo.Teams(), txn)
 	return &domains{
 		team:   team,
 		folder: folder,
 		note:   note,
+		asset:  asset,
 	}
 }
 
 func (s *Server) initRestRoute(domains *domains) {
-	handler := hdl.NewHandler(domains.team, domains.folder, domains.note)
+	handler := hdl.NewHandler(domains.team, domains.folder, domains.note, domains.asset)
 
 	routerAuth := s.router.Group("v1")
 	routerAuth.Use(auth.AuthMiddleware())

@@ -50,3 +50,87 @@ func (f *folderSQLRepo) DeleteFolderShare(ctx context.Context, share *model.Fold
 	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", share.FolderID, share.SharedWithUserID).Delete(&model.FolderShare{}).Error
 	return err
 }
+
+func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (*model.TeamAsset, error) {
+	// Get all folders that team members own or can access
+	var folders []*model.TeamAssetFolder
+	var team model.Team
+
+	err := f.db.Where("id = ?", teamID).First(&team).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// Query folders owned by team members
+	var ownedFolders []struct {
+		ID        string `gorm:"column:id"`
+		Name      string `gorm:"column:name"`
+		OwnerID   string `gorm:"column:owner_id"`
+		OwnerName string `gorm:"column:owner_name"`
+	}
+
+	err = f.db.Table("folders").
+		Select("folders.id, folders.name, folders.owner_id, users.username as owner_name").
+		Joins("JOIN users ON folders.owner_id = users.id").
+		Joins("JOIN team_members ON users.id = team_members.user_id").
+		Where("team_members.team_id = ?", teamID).
+		Find(&ownedFolders).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert owned folders to TeamAssetFolder
+	for _, folder := range ownedFolders {
+		teamAssetFolder := &model.TeamAssetFolder{
+			ID:        folder.ID,
+			Name:      folder.Name,
+			OwnerID:   folder.OwnerID,
+			OwnerName: folder.OwnerName,
+			Notes:     []model.TeamAssetNote{},
+		}
+		folders = append(folders, teamAssetFolder)
+	}
+
+	// Get notes for each folder
+	for _, folder := range folders {
+		var notes []struct {
+			ID    string `gorm:"column:id"`
+			Title string `gorm:"column:title"`
+			Body  string `gorm:"column:body"`
+		}
+
+		// Get notes in this folder
+		err = f.db.Table("notes").
+			Select("notes.id, notes.title, notes.body").
+			Where("notes.folder_id = ?", folder.ID).
+			Find(&notes).Error
+
+		if err != nil {
+			return nil, err
+		}
+
+		// Convert notes to TeamAssetNote
+		for _, note := range notes {
+			teamAssetNote := model.TeamAssetNote{
+				ID:    note.ID,
+				Title: note.Title,
+				Body:  note.Body,
+			}
+			folder.Notes = append(folder.Notes, teamAssetNote)
+		}
+	}
+
+	// Create TeamAsset response
+	teamAsset := &model.TeamAsset{
+		TeamID:   team.ID,
+		TeamName: team.Name,
+		Folders:  []model.TeamAssetFolder{},
+	}
+
+	for _, folder := range folders {
+		teamAsset.Folders = append(teamAsset.Folders, *folder)
+	}
+
+	return teamAsset, nil
+}

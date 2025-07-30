@@ -14,4 +14,5 @@ type IFolderRepo interface {
 	GetFolderShare(ctx context.Context, folderID string, userID string) (*model.FolderShare, error)
 	CreateFolderShare(ctx context.Context, share *model.FolderShare) error
 	DeleteFolderShare(ctx context.Context, share *model.FolderShare) error
+	GetFoldersByTeamID(ctx context.Context, teamID string) (*model.TeamAsset, error)
 }

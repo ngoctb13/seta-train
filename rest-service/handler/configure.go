@@ -10,13 +10,15 @@ type Handler struct {
 	team   *team_usecases.Team
 	folder *folder_usecases.Folder
 	note   *folder_usecases.Note
+	asset  *folder_usecases.Asset
 }
 
-func NewHandler(team *team_usecases.Team, folder *folder_usecases.Folder, note *folder_usecases.Note) *Handler {
+func NewHandler(team *team_usecases.Team, folder *folder_usecases.Folder, note *folder_usecases.Note, asset *folder_usecases.Asset) *Handler {
 	return &Handler{
 		team:   team,
 		folder: folder,
 		note:   note,
+		asset:  asset,
 	}
 }
 
@@ -47,4 +49,7 @@ func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
 	router.POST("/notes/:noteId/share", h.ShareNoteHandler())
 	router.DELETE("/folders/:folderId/share/:userId", h.RevokeSharingFolderHandler())
 	router.DELETE("/notes/:noteId/share/:userId", h.RevokeSharingNoteHandler())
+
+	// Manager routes
+	router.GET("/teams/:teamId/assets", h.GetAssetsHandler())
 }
