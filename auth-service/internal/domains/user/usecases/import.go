@@ -139,7 +139,7 @@ func (i *ImportUsecase) validateUser(user CSVUser, lineNumber int) *ImportError 
 	if user.Username == "" {
 		return &ImportError{
 			Line:  lineNumber,
-			Error: "Username is required",
+			Error: ErrUsernameRequired.Error(),
 		}
 	}
 
@@ -148,15 +148,15 @@ func (i *ImportUsecase) validateUser(user CSVUser, lineNumber int) *ImportError 
 	if !emailRegex.MatchString(user.Email) {
 		return &ImportError{
 			Line:  lineNumber,
-			Error: "Invalid email format",
+			Error: ErrEmailInvalid.Error(),
 		}
 	}
 
 	// Validate role
-	if user.Role != "MANAGER" && user.Role != "MEMBER" {
+	if user.Role != ManagerRole && user.Role != MemberRole {
 		return &ImportError{
 			Line:  lineNumber,
-			Error: "Invalid role, must be MANAGER or MEMBER",
+			Error: ErrInvalidRole.Error(),
 		}
 	}
 

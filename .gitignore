@@ -1,0 +1,30 @@
+# Logs
+logs/
+*.log
+
+# Build artifacts
+bin/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Go specific
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work.sum
+
+# Temporary files
+*.tmp
+*.temp 
