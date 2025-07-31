@@ -1,0 +1,8 @@
+username,email,password,role
+john_doe,john@example.com,password123,MEMBER
+jane_smith,jane@example.com,securepass456,MANAGER
+bob_wilson,bob@example.com,short,INVALID_ROLE
+alice_brown,invalid-email,strongpass123,MANAGER
+charlie_davis,charlie@example.com,testpass456,MEMBER
+,empty@example.com,password123,MEMBER
+duplicate_user,john@example.com,password123,MEMBER 
