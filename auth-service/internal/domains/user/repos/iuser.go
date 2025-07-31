@@ -12,4 +12,5 @@ type IUserRepo interface {
 	GetUserByEmail(ctx context.Context, email string) (*model.User, error)
 	GetUserByUsername(ctx context.Context, username string) (*model.User, error)
 	GetAllUsers(ctx context.Context) ([]*model.User, error)
+	UpdateUserRole(ctx context.Context, userID string, role string) error
 }

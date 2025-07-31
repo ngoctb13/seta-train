@@ -43,6 +43,7 @@ func ToSharedModelUser(u *model.User) *sharedmodel.User {
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*model.User, error) {
 	hashedPassword, err := utils.HashPassword(input.Password)
 	if err != nil {
+		r.Logger.Error("Failed to hash password: %v", err)
 		return nil, err
 	}
 
@@ -55,6 +56,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUse
 
 	err = r.UserUsecase.CreateUser(ctx, ToSharedModelUser(user))
 	if err != nil {
+		r.Logger.Error("CreateUserUsecase fail with error: %v", err)
 		return nil, err
 	}
 
@@ -85,18 +87,32 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginInput) (*
 
 // Logout is the resolver for the logout field.
 func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	r.Logger.Info("User logged out successfully")
 	return true, nil
 }
 
 // AssignRole is the resolver for the assignRole field.
 func (r *mutationResolver) AssignRole(ctx context.Context, input model.AssignRoleInput) (*model.User, error) {
-	return &model.User{}, nil
+	err := r.UserUsecase.AssignRole(ctx, input.UserID, string(input.Role))
+	if err != nil {
+		r.Logger.Error("AssignRoleUsecase fail with error: %v", err)
+		return nil, err
+	}
+
+	user, err := r.UserUsecase.GetUserByID(ctx, input.UserID)
+	if err != nil {
+		r.Logger.Error("GetUserByIDUsecase fail with error: %v", err)
+		return nil, err
+	}
+
+	return ToGraphQLUser(user), nil
 }
 
 // FetchUsers is the resolver for the fetchUsers field.
 func (r *queryResolver) FetchUsers(ctx context.Context) ([]*model.User, error) {
 	sharedUsers, err := r.UserUsecase.GetAllUsers(ctx)
 	if err != nil {
+		r.Logger.Error("GetAllUsersUsecase fail with error: %v", err)
 		return nil, err
 	}
 
@@ -117,6 +133,7 @@ func (r *queryResolver) VerifyToken(ctx context.Context, token string) (*model.U
 
 	user, err := r.UserUsecase.GetUserByID(ctx, id)
 	if err != nil {
+		r.Logger.Error("GetUserByIDUsecase fail with error: %v", err)
 		return nil, err
 	}
 

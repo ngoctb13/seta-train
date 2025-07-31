@@ -36,3 +36,7 @@ func (u *User) GetUserByEmail(ctx context.Context, email string) (*model.User, e
 func (u *User) GetUserByUsername(ctx context.Context, username string) (*model.User, error) {
 	return u.userRepo.GetUserByUsername(ctx, username)
 }
+
+func (u *User) AssignRole(ctx context.Context, userID string, role string) error {
+	return u.userRepo.UpdateUserRole(ctx, userID, role)
+}

@@ -44,3 +44,7 @@ func (u *userSQLRepo) GetAllUsers(ctx context.Context) ([]*model.User, error) {
 	err := u.db.Find(&users).Error
 	return users, err
 }
+
+func (u *userSQLRepo) UpdateUserRole(ctx context.Context, userID string, role string) error {
+	return u.db.Model(&model.User{}).Where("userid = ?", userID).Update("role", role).Error
+}
