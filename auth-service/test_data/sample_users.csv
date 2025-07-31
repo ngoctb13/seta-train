@@ -1,0 +1,6 @@
+username,email,password,role
+john_doe,john@example.com,password123,MEMBER
+jane_smith,jane@example.com,securepass456,MANAGER
+bob_wilson,bob@example.com,mypassword789,MEMBER
+alice_brown,alice@example.com,strongpass123,MANAGER
+charlie_davis,charlie@example.com,testpass456,MEMBER 

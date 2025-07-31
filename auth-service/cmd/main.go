@@ -13,12 +13,13 @@ import (
 	"github.com/ngoctb13/seta-train/auth-service/graph"
 	"github.com/ngoctb13/seta-train/auth-service/internal/auth"
 	"github.com/ngoctb13/seta-train/auth-service/internal/domains/user/usecases"
+	"github.com/ngoctb13/seta-train/auth-service/internal/handlers"
 	"github.com/ngoctb13/seta-train/auth-service/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/infra"
+	"github.com/ngoctb13/seta-train/shared-modules/logger"
 	"github.com/ngoctb13/seta-train/shared-modules/setting"
 	"github.com/vektah/gqlparser/v2/ast"
-	"go.uber.org/zap"
 )
 
 func main() {
@@ -30,9 +31,12 @@ func main() {
 
 	defer setting.WaitOSSignal()
 
+	// Initialize logger
+	logger := logger.InitLogger("auth-service")
+
 	cfg, err := config.Load(configFile)
 	if err != nil {
-		zap.S().Errorf("load config fail with err: %v", err)
+		logger.Error("Failed to load config: %v", err)
 		panic(err)
 	}
 
@@ -41,17 +45,20 @@ func main() {
 
 	db, err := infra.InitPostgres(cfg.DB)
 	if err != nil {
-		zap.S().Errorf("Init db error: %v", err)
+		logger.Error("Failed to initialize database: %v", err)
 		panic(err)
 	}
 
 	repos := repos.NewSQLRepo(db, cfg.DB)
 	userRepo := repos.Users()
 	userUsecase := usecases.NewUser(userRepo)
+	importUsecase := usecases.NewImportUsecase(userRepo)
 
+	importHandler := handlers.NewImportHandler(importUsecase, logger)
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{
 		Resolvers: &graph.Resolver{
 			UserUsecase: userUsecase,
+			Logger:      logger,
 		},
 		Directives: graph.DirectiveRoot{
 			Auth: graph.AuthDirective,
@@ -71,7 +78,8 @@ func main() {
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	http.Handle("/query", auth.AuthContextMiddleware(srv))
+	http.HandleFunc("/import-users", importHandler.ImportUsers)
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	logger.Info("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

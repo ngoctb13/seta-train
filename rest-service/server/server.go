@@ -11,27 +11,29 @@ import (
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/infra"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
-	"go.uber.org/zap"
+	"github.com/ngoctb13/seta-train/shared-modules/logger"
 )
 
 type Server struct {
 	httpServer *http.Server
 	router     *gin.Engine
 	cfg        *config.AppConfig
+	logger     *logger.Logger
 }
 
-func NewServer(cfg *config.AppConfig) *Server {
+func NewServer(cfg *config.AppConfig, logger *logger.Logger) *Server {
 	router := gin.New()
 	return &Server{
 		router: router,
 		cfg:    cfg,
+		logger: logger,
 	}
 }
 
 func (s *Server) Init() {
 	db, err := infra.InitPostgres(s.cfg.DB)
 	if err != nil {
-		zap.S().Errorf("Init db error: %v", err)
+		s.logger.Error("Failed to initialize database: %v", err)
 		panic(err)
 	}
 
@@ -46,7 +48,7 @@ func (s *Server) Init() {
 func (s *Server) ListenHTTP() error {
 	listen, err := net.Listen("tcp", ":"+os.Getenv("REST_PORT"))
 	if err != nil {
-		zap.S().Errorf("err %v", err)
+		s.logger.Error("Failed to create listener: %v", err)
 		panic(err)
 	}
 	address := fmt.Sprintf(":%s", os.Getenv("REST_PORT"))
@@ -56,7 +58,6 @@ func (s *Server) ListenHTTP() error {
 		Addr:    address,
 	}
 
-	zap.S().Infof("starting http server at port %v ...", os.Getenv("REST_PORT"))
-
+	s.logger.Info("Starting HTTP server on port %s", os.Getenv("REST_PORT"))
 	return s.httpServer.Serve(listen)
 }

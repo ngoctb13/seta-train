@@ -20,13 +20,14 @@ func (h *Handler) CreateTeamHandler() gin.HandlerFunc {
 		role, ok := c.Get(userRoleKey)
 		userID, _ := c.Get(userIDKey)
 		if !ok || role != managerRole {
+			h.logger.Error("Unauthorized team creation attempt by user %s with role %v", userID, role)
 			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can create team"})
 			return
 		}
 
 		var input models.CreateTeamReqeust
 		if err := c.ShouldBindJSON(&input); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("Failed to bind JSON for team creation: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -37,11 +38,12 @@ func (h *Handler) CreateTeamHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("CreateTeamUsecase fail with error: %v", err)
+			h.logger.Error("CreateTeamUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("Team '%s' created successfully by user %s", input.TeamName, userID)
 		c.JSON(http.StatusOK, gin.H{"message": "Team created successfully"})
 	}
 }
@@ -51,19 +53,21 @@ func (h *Handler) AddTeamMembersHandler() gin.HandlerFunc {
 		role, ok := c.Get(userRoleKey)
 		userID, _ := c.Get(userIDKey)
 		if !ok || role != managerRole {
+			h.logger.Error("Unauthorized team member addition attempt by user %s with role %v", userID, role)
 			c.JSON(http.StatusForbidden, gin.H{"error": "only manager can do"})
 			return
 		}
 
 		teamID := c.Param("teamId")
 		if teamID == "" {
+			h.logger.Error("Team ID is missing in request")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "team ID is required"})
 			return
 		}
 
 		var input models.AddTeamMembersRequest
 		if err := c.ShouldBindJSON(&input); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("Failed to bind JSON for adding team members: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -75,11 +79,12 @@ func (h *Handler) AddTeamMembersHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("AddTeamMembers usecase fail with error: %v", err)
+			h.logger.Error("AddTeamMembers usecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("Successfully added %d members to team %s", len(input.UserIDs), teamID)
 		c.JSON(http.StatusOK, gin.H{"message": "Members added successfully"})
 	}
 }

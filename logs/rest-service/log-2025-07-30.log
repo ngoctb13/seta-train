@@ -1,0 +1,4 @@
+{"level":"info","time":"2025-07-30T22:45:10+07:00","message":"Starting HTTP server on port 8090"}
+{"level":"info","time":"2025-07-30T22:48:44+07:00","message":"Starting HTTP server on port 8090"}
+{"level":"info","time":"2025-07-30T22:50:37+07:00","message":"Team 'Team 2' created successfully by user f8071ea3-c209-4bc0-b892-2ed72cc9eb7a"}
+{"level":"info","method":"POST","path":"/v1/teams","status":200,"latency":60.494,"time":"2025-07-30T22:50:37+07:00","message":"Incoming request"}
