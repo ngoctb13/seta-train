@@ -2,3 +2,17 @@
 {"level":"info","time":"2025-07-31T09:53:33+07:00","message":"Starting HTTP server on port 8090"}
 {"level":"info","time":"2025-07-31T10:09:08+07:00","message":"Starting HTTP server on port 8090"}
 {"level":"info","time":"2025-07-31T11:29:03+07:00","message":"Starting HTTP server on port 8090"}
+{"level":"info","time":"2025-07-31T15:13:21+07:00","message":"Starting HTTP server on port 8090"}
+{"level":"info","time":"2025-07-31T15:36:48+07:00","message":"Starting HTTP server on port 8090"}
+{"level":"info","time":"2025-07-31T15:38:41+07:00","message":"Team 'Team 3' created successfully by user f8071ea3-c209-4bc0-b892-2ed72cc9eb7a"}
+{"level":"info","method":"POST","path":"/v1/teams","status":200,"latency":92.2546,"time":"2025-07-31T15:38:41+07:00","message":"Incoming request"}
+{"level":"error","time":"2025-07-31T15:43:31+07:00","message":"AddTeamMembers usecase fail with error: user is not main manager of this team"}
+{"level":"info","method":"POST","path":"/v1/teams/7bbf65a9-f9db-41e5-af3e-7c6a1f1b2d0b/members","status":400,"latency":15.1958,"time":"2025-07-31T15:43:31+07:00","message":"Incoming request"}
+{"level":"error","time":"2025-07-31T15:44:11+07:00","message":"AddTeamMembers usecase fail with error: ERROR: invalid input syntax for type uuid: \"71d\" (SQLSTATE 22P02)"}
+{"level":"info","method":"POST","path":"/v1/teams/37504efe-6bf6-45cc-a8c1-2bf860662853/members","status":400,"latency":26.8397,"time":"2025-07-31T15:44:11+07:00","message":"Incoming request"}
+{"level":"error","time":"2025-07-31T15:44:33+07:00","message":"AddTeamMembers usecase fail with error: user is already a member of this team"}
+{"level":"info","method":"POST","path":"/v1/teams/37504efe-6bf6-45cc-a8c1-2bf860662853/members","status":400,"latency":6.9965,"time":"2025-07-31T15:44:33+07:00","message":"Incoming request"}
+{"level":"error","time":"2025-07-31T15:52:35+07:00","message":"AddTeamMembers usecase fail with error: user is already a member of this team"}
+{"level":"info","method":"POST","path":"/v1/teams/37504efe-6bf6-45cc-a8c1-2bf860662853/members","status":400,"latency":17.6446,"time":"2025-07-31T15:52:35+07:00","message":"Incoming request"}
+{"level":"error","time":"2025-07-31T15:52:37+07:00","message":"AddTeamMembers usecase fail with error: user is already a member of this team"}
+{"level":"info","method":"POST","path":"/v1/teams/37504efe-6bf6-45cc-a8c1-2bf860662853/members","status":400,"latency":9.7246,"time":"2025-07-31T15:52:37+07:00","message":"Incoming request"}

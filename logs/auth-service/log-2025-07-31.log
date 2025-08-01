@@ -3,3 +3,5 @@
 {"level":"error","time":"2025-07-31T10:10:03+07:00","message":"Failed to parse multipart form: request Content-Type isn't multipart/form-data"}
 {"level":"error","time":"2025-07-31T10:10:03+07:00","message":"Failed to parse multipart form: request Content-Type isn't multipart/form-data"}
 {"level":"info","time":"2025-07-31T11:29:06+07:00","message":"connect to http://localhost:8080/ for GraphQL playground"}
+{"level":"info","time":"2025-07-31T15:13:26+07:00","message":"connect to http://localhost:8080/ for GraphQL playground"}
+{"level":"info","time":"2025-07-31T15:36:51+07:00","message":"connect to http://localhost:8080/ for GraphQL playground"}
