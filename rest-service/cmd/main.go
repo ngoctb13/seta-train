@@ -1,7 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/ngoctb13/seta-train/rest-service/server"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
@@ -34,8 +39,30 @@ func main() {
 	s := server.NewServer(cfg, logger)
 	s.Init()
 
-	if err := s.ListenHTTP(); err != nil {
-		logger.Error("Failed to start server: %v", err)
-		panic(err)
+	serverErr := make(chan error, 1)
+	go func() {
+		if err := s.ListenHTTP(); err != nil {
+			serverErr <- err
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	select {
+	case <-stop:
+		logger.Info("Received shutdown signal")
+	case err := <-serverErr:
+		logger.Error("Server error: %v", err)
+	}
+
+	//Graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := s.Shutdown(ctx); err != nil {
+		logger.Error("Failed to shutdown server: %v", err)
+	} else {
+		logger.Info("Server shutdown completed")
 	}
 }

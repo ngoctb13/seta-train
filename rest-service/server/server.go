@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"net/http"
@@ -60,4 +61,10 @@ func (s *Server) ListenHTTP() error {
 
 	s.logger.Info("Starting HTTP server on port %s", os.Getenv("REST_PORT"))
 	return s.httpServer.Serve(listen)
+}
+
+// Shutdown ...
+func (s *Server) Shutdown(ctx context.Context) error {
+	s.logger.Info("Shutting down server gracefully...")
+	return s.httpServer.Shutdown(ctx)
 }
