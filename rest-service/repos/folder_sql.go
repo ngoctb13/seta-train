@@ -3,7 +3,7 @@ package repos
 import (
 	"context"
 
-	"github.com/ngoctb13/seta-train/shared-modules/model"
+	"github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	"gorm.io/gorm"
 )
 
@@ -15,46 +15,46 @@ func NewFolderSQLRepo(db *gorm.DB) *folderSQLRepo {
 	return &folderSQLRepo{db: db}
 }
 
-func (f *folderSQLRepo) CreateFolder(ctx context.Context, folder *model.Folder) error {
+func (f *folderSQLRepo) CreateFolder(ctx context.Context, folder *models.Folder) error {
 	err := f.db.Create(folder).Error
 	return err
 }
 
-func (f *folderSQLRepo) GetFolderByID(ctx context.Context, id string) (*model.Folder, error) {
-	var folder model.Folder
+func (f *folderSQLRepo) GetFolderByID(ctx context.Context, id string) (*models.Folder, error) {
+	var folder models.Folder
 	err := f.db.Where("id = ?", id).First(&folder).Error
 	return &folder, err
 }
 
-func (f *folderSQLRepo) UpdateFolder(ctx context.Context, folder *model.Folder) error {
+func (f *folderSQLRepo) UpdateFolder(ctx context.Context, folder *models.Folder) error {
 	err := f.db.Save(folder).Error
 	return err
 }
 
 func (f *folderSQLRepo) DeleteFolder(ctx context.Context, id string) error {
-	return f.db.Where("id = ?", id).Delete(&model.Folder{}).Error
+	return f.db.Where("id = ?", id).Delete(&models.Folder{}).Error
 }
 
-func (f *folderSQLRepo) GetFolderShare(ctx context.Context, folderID string, userID string) (*model.FolderShare, error) {
-	var folderShare model.FolderShare
+func (f *folderSQLRepo) GetFolderShare(ctx context.Context, folderID string, userID string) (*models.FolderShare, error) {
+	var folderShare models.FolderShare
 	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", folderID, userID).Find(&folderShare).Error
 	return &folderShare, err
 }
 
-func (f *folderSQLRepo) CreateFolderShare(ctx context.Context, share *model.FolderShare) error {
+func (f *folderSQLRepo) CreateFolderShare(ctx context.Context, share *models.FolderShare) error {
 	err := f.db.Create(share).Error
 	return err
 }
 
-func (f *folderSQLRepo) DeleteFolderShare(ctx context.Context, share *model.FolderShare) error {
-	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", share.FolderID, share.SharedWithUserID).Delete(&model.FolderShare{}).Error
+func (f *folderSQLRepo) DeleteFolderShare(ctx context.Context, share *models.FolderShare) error {
+	err := f.db.Where("folder_id = ? AND shared_with_user_id = ?", share.FolderID, share.SharedWithUserID).Delete(&models.FolderShare{}).Error
 	return err
 }
 
-func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (*model.TeamAsset, error) {
+func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (*models.TeamAsset, error) {
 	// Get all folders that team members own or can access
-	var folders []*model.TeamAssetFolder
-	var team model.Team
+	var folders []*models.TeamAssetFolder
+	var team models.Team
 
 	err := f.db.Where("id = ?", teamID).First(&team).Error
 	if err != nil {
@@ -82,12 +82,12 @@ func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (
 
 	// Convert owned folders to TeamAssetFolder
 	for _, folder := range ownedFolders {
-		teamAssetFolder := &model.TeamAssetFolder{
+		teamAssetFolder := &models.TeamAssetFolder{
 			ID:        folder.ID,
 			Name:      folder.Name,
 			OwnerID:   folder.OwnerID,
 			OwnerName: folder.OwnerName,
-			Notes:     []model.TeamAssetNote{},
+			Notes:     []models.TeamAssetNote{},
 		}
 		folders = append(folders, teamAssetFolder)
 	}
@@ -112,7 +112,7 @@ func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (
 
 		// Convert notes to TeamAssetNote
 		for _, note := range notes {
-			teamAssetNote := model.TeamAssetNote{
+			teamAssetNote := models.TeamAssetNote{
 				ID:    note.ID,
 				Title: note.Title,
 				Body:  note.Body,
@@ -122,10 +122,10 @@ func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (
 	}
 
 	// Create TeamAsset response
-	teamAsset := &model.TeamAsset{
+	teamAsset := &models.TeamAsset{
 		TeamID:   team.ID,
 		TeamName: team.Name,
-		Folders:  []model.TeamAssetFolder{},
+		Folders:  []models.TeamAssetFolder{},
 	}
 
 	for _, folder := range folders {

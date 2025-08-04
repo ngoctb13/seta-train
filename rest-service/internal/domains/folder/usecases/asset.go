@@ -3,12 +3,12 @@ package usecases
 import (
 	"context"
 
+	sharedModel "github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/rest-service/internal/domains/folder/repos"
 	model "github.com/ngoctb13/seta-train/rest-service/internal/domains/models"
 	teamRepos "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/repos"
 	teamUsecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
-	sharedModel "github.com/ngoctb13/seta-train/shared-modules/model"
 )
 
 type Asset struct {

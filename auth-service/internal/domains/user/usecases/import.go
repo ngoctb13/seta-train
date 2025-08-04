@@ -9,8 +9,8 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/ngoctb13/seta-train/auth-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/auth-service/internal/domains/user/repos"
-	"github.com/ngoctb13/seta-train/shared-modules/model"
 	"github.com/ngoctb13/seta-train/shared-modules/utils"
 )
 
@@ -223,7 +223,7 @@ func (i *ImportUsecase) worker(ctx context.Context, userChan <-chan CSVUser, res
 
 	for user := range userChan {
 		// Convert CSVUser to model.User
-		modelUser := &model.User{
+		modelUser := &models.User{
 			Username: user.Username,
 			Email:    user.Email,
 			Role:     user.Role,

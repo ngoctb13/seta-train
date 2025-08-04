@@ -1,4 +1,4 @@
-package model
+package models
 
 type User struct {
 	ID           string `gorm:"column:userid;default:uuid_generate_v4()"`

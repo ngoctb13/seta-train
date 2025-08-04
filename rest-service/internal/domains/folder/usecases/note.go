@@ -3,10 +3,10 @@ package usecases
 import (
 	"context"
 
+	sharedModel "github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/rest-service/internal/domains/folder/repos"
 	model "github.com/ngoctb13/seta-train/rest-service/internal/domains/models"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
-	sharedModel "github.com/ngoctb13/seta-train/shared-modules/model"
 	"gorm.io/gorm"
 )
 

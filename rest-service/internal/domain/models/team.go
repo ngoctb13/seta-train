@@ -1,4 +1,4 @@
-package model
+package models
 
 type Team struct {
 	ID   string `gorm:"column:id;default:uuid_generate_v4()"`

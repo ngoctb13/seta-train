@@ -9,7 +9,7 @@ import (
 
 	"github.com/ngoctb13/seta-train/auth-service/graph/model"
 	"github.com/ngoctb13/seta-train/auth-service/internal/auth"
-	sharedmodel "github.com/ngoctb13/seta-train/shared-modules/model"
+	sharedmodel "github.com/ngoctb13/seta-train/auth-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/shared-modules/utils"
 )
 
