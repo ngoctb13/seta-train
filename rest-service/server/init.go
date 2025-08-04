@@ -59,6 +59,6 @@ func (s *Server) initRestRoute(domains *domains) {
 }
 
 func (s *Server) initRouter(domains *domains) {
-	//init rest route
+	// init rest route
 	s.initRestRoute(domains)
 }

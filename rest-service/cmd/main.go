@@ -25,7 +25,7 @@ func main() {
 	// Initialize logger
 	logger := logger.InitLogger("rest-service")
 
-	//load config
+	// load config
 	cfg, err := config.Load(configFile)
 	if err != nil {
 		logger.Error("Failed to load config: %v", err)
@@ -35,7 +35,7 @@ func main() {
 	// connect to db
 	go setting.ConnectDatabase(cfg.DB)
 
-	//start new server
+	// start new server
 	s := server.NewServer(cfg, logger)
 	s.Init()
 
@@ -56,7 +56,7 @@ func main() {
 		logger.Error("Server error: %v", err)
 	}
 
-	//Graceful shutdown
+	// Graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
