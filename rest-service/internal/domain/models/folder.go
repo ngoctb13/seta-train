@@ -14,7 +14,6 @@ const (
 )
 
 type FolderShare struct {
-	ID               string     `gorm:"column:id;default:uuid_generate_v4()"`
 	FolderID         string     `gorm:"column:folder_id"`
 	SharedWithUserID string     `gorm:"column:shared_with_user_id"`
 	AccessType       AccessType `gorm:"column:access_type"`

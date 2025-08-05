@@ -14,15 +14,15 @@ CREATE TABLE IF NOT EXISTS notes (
 CREATE TYPE access_type AS ENUM ('read', 'write');
 
 CREATE TABLE IF NOT EXISTS folder_shares (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     folder_id UUID NOT NULL REFERENCES folders(id) ON DELETE CASCADE,
     shared_with_user_id UUID NOT NULL REFERENCES users(userid) ON DELETE CASCADE,
-    access_type access_type NOT NULL
+    access_type access_type NOT NULL,
+    PRIMARY KEY (folder_id, shared_with_user_id)
 );
 
 CREATE TABLE IF NOT EXISTS note_shares (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     note_id UUID NOT NULL REFERENCES notes(id) ON DELETE CASCADE,
     shared_with_user_id UUID NOT NULL REFERENCES users(userid) ON DELETE CASCADE,
-    access_type access_type NOT NULL
+    access_type access_type NOT NULL,
+    PRIMARY KEY (note_id, shared_with_user_id)
 );

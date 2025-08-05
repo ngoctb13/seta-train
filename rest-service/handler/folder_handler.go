@@ -44,6 +44,7 @@ func (h *Handler) GetFolderDetailsHandler() gin.HandlerFunc {
 		}
 
 		userID, _ := c.Get(userIDKey)
+		log.Printf("GetFolderDetailsHandler has userID: %v", userID)
 
 		folder, err := h.folder.GetFolderDetails(c, &useCaseModel.GetFolderDetailsInput{
 			FolderID: folderID,

@@ -8,7 +8,6 @@ type Note struct {
 }
 
 type NoteShare struct {
-	ID               string     `gorm:"column:id;default:uuid_generate_v4()"`
 	NoteID           string     `gorm:"column:note_id"`
 	SharedWithUserID string     `gorm:"column:shared_with_user_id"`
 	AccessType       AccessType `gorm:"column:access_type"`

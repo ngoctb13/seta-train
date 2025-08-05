@@ -37,7 +37,7 @@ func (h *Handler) ConfigAuthRouteAPI(router *gin.RouterGroup) {
 
 	// folder routes
 	router.POST("/folders", h.CreateFolderHandler())
-	router.POST("/folders/:folderId", h.GetFolderDetailsHandler())
+	router.GET("/folders/:folderId", h.GetFolderDetailsHandler())
 	router.PUT("/folders/:folderId", h.UpdateFolderHandler())
 	router.DELETE("/folders/:folderId", h.DeleteFolderHandler())
 

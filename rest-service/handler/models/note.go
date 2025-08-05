@@ -17,7 +17,7 @@ type UpdateNoteRequest struct {
 }
 
 func ToNoteUseCaseModel(notes []Note) []useCaseModel.Note {
-	useCaseNotes := make([]useCaseModel.Note, len(notes))
+	useCaseNotes := make([]useCaseModel.Note, 0)
 	for _, note := range notes {
 		useCaseNotes = append(useCaseNotes, useCaseModel.Note{
 			Title: note.Title,

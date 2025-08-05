@@ -42,7 +42,7 @@ func (n *noteSQLRepo) UpdateNote(ctx context.Context, note *models.Note) error {
 
 func (n *noteSQLRepo) GetNoteShare(ctx context.Context, noteID string, userID string) (*models.NoteShare, error) {
 	var noteShare models.NoteShare
-	err := n.db.Where("note_id = ? AND shared_with_user_id = ?", noteID, userID).First(&noteShare).Error
+	err := n.db.Where("note_id = ? AND shared_with_user_id = ?", noteID, userID).Find(&noteShare).Error
 	return &noteShare, err
 }
 

@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"errors"
 
 	sharedModel "github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/rest-service/internal/domains/folder/repos"
@@ -54,7 +53,7 @@ func (f *Folder) GetFolderDetails(ctx context.Context, input *model.GetFolderDet
 		return nil, err
 	}
 
-	if folder.OwnerID != input.UserID || folderShare.ID == "" {
+	if folder.OwnerID != input.UserID && folderShare.SharedWithUserID == "" {
 		return nil, ErrFolderNotSharedToUser
 	}
 
@@ -71,8 +70,19 @@ func (f *Folder) UpdateFolder(ctx context.Context, input *model.UpdateFolderInpu
 		return ErrFolderNotFound
 	}
 
+	folderShare, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, input.UserID)
+	if err != nil {
+		return err
+	}
+
 	if folder.OwnerID != input.UserID {
-		return ErrUserNotFolderOwner
+		if folderShare.SharedWithUserID == "" {
+			return ErrFolderNotSharedToUser
+		}
+
+		if folderShare.AccessType != sharedModel.AccessWrite {
+			return ErrNoPermission
+		}
 	}
 
 	folder.Name = input.FolderName
@@ -92,7 +102,7 @@ func (f *Folder) DeleteFolder(ctx context.Context, input *model.DeleteFolderInpu
 		}
 
 		if folder.OwnerID != input.UserID {
-			return errors.New("user is not the owner of the folder")
+			return ErrUserNotFolderOwner
 		}
 
 		notesOfFolder, err := f.noteRepo.GetNotesByFolderID(ctx, input.FolderID)
@@ -127,13 +137,9 @@ func (f *Folder) ShareFolder(ctx context.Context, input *model.ShareFolderInput)
 	}
 
 	for _, userID := range input.SharedUserIDs {
-		folderShare, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, userID)
+		_, err := f.folderRepo.GetFolderShare(ctx, input.FolderID, userID)
 		if err != nil {
 			return err
-		}
-
-		if folderShare != nil {
-			continue
 		}
 
 		newShare := &sharedModel.FolderShare{
@@ -170,7 +176,7 @@ func (f *Folder) RevokeSharingFolder(ctx context.Context, input *model.RevokeSha
 		return err
 	}
 
-	if folderShare.ID == "" {
+	if folderShare.FolderID == "" {
 		return ErrFolderNotSharedToUser
 	}
 

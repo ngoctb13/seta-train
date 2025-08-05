@@ -81,8 +81,8 @@ func (n *Note) ViewNote(ctx context.Context, input *model.ViewNoteInput) (*share
 		return nil, err
 	}
 
-	if folder.OwnerID != input.UserID && (folderShare.ID == "" && noteShare.ID == "") {
-		return nil, ErrNoteNotSharedToUser
+	if folder.OwnerID != input.UserID && (folderShare.FolderID == "" && noteShare.NoteID == "") {
+		return nil, ErrCannotAccessNote
 	}
 
 	return note, nil
@@ -117,12 +117,12 @@ func (n *Note) UpdateNote(ctx context.Context, input *model.UpdateNoteInput) err
 		return err
 	}
 
-	if folder.OwnerID != input.UserID && (folderShare.ID == "" && noteShare.ID == "") {
+	if folder.OwnerID != input.UserID && (folderShare.FolderID == "" && noteShare.NoteID == "") {
 		return ErrNoteNotSharedToUser
 	}
 
-	if noteShare.AccessType != sharedModel.AccessWrite && folderShare.AccessType != sharedModel.AccessWrite {
-		return ErrCannotAccessNote
+	if folder.OwnerID != input.UserID && noteShare.AccessType != sharedModel.AccessWrite && folderShare.AccessType != sharedModel.AccessWrite {
+		return ErrNoPermission
 	}
 
 	note.Title = input.Note.Title
@@ -191,13 +191,9 @@ func (n *Note) ShareNote(ctx context.Context, input *model.ShareNoteInput) error
 	}
 
 	for _, userID := range input.SharedUserIDs {
-		noteShare, err := n.noteRepo.GetNoteShare(ctx, input.NoteID, userID)
+		_, err := n.noteRepo.GetNoteShare(ctx, input.NoteID, userID)
 		if err != nil {
 			return err
-		}
-
-		if noteShare != nil {
-			continue
 		}
 
 		newShare := &sharedModel.NoteShare{
@@ -244,7 +240,7 @@ func (n *Note) RevokeSharingNote(ctx context.Context, input *model.RevokeSharing
 			return err
 		}
 
-		if noteShare.ID == "" {
+		if noteShare.NoteID == "" {
 			return ErrNoteNotSharedToUser
 		}
 
@@ -258,7 +254,7 @@ func (n *Note) RevokeSharingNote(ctx context.Context, input *model.RevokeSharing
 			return err
 		}
 
-		if folderShare.ID == "" {
+		if folderShare.FolderID == "" {
 			return ErrFolderNotSharedToUser
 		}
 

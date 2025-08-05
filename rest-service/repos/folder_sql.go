@@ -42,7 +42,7 @@ func (f *folderSQLRepo) GetFolderShare(ctx context.Context, folderID string, use
 }
 
 func (f *folderSQLRepo) CreateFolderShare(ctx context.Context, share *models.FolderShare) error {
-	err := f.db.Create(share).Error
+	err := f.db.Table("folder_shares").Create(share).Error
 	return err
 }
 
