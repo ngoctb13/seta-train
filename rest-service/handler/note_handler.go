@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +17,7 @@ func (h *Handler) CreateNotesHandler() gin.HandlerFunc {
 
 		var req models.CreateNoteRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -32,11 +31,12 @@ func (h *Handler) CreateNotesHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("CreateNotesUsecase fail with error: %v", err)
+			h.logger.Error("CreateNotesUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("Created notes successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Notes created successfully"})
 	}
 }
@@ -45,6 +45,7 @@ func (h *Handler) ViewNoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		noteID := c.Param("noteId")
 		if noteID == "" {
+			h.logger.Error("note ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
 		}
 
@@ -56,11 +57,12 @@ func (h *Handler) ViewNoteHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("ViewNoteUsecase fail with error: %v", err)
+			h.logger.Error("ViewNoteUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("ViewNoteHandler successfully")
 		c.JSON(http.StatusOK, note)
 	}
 }
@@ -69,12 +71,13 @@ func (h *Handler) UpdateNoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		noteID := c.Param("noteId")
 		if noteID == "" {
+			h.logger.Error("note ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
 		}
 
 		var req models.UpdateNoteRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -91,11 +94,12 @@ func (h *Handler) UpdateNoteHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("UpdateNoteUsecase fail with error: %v", err)
+			h.logger.Error("UpdateNoteUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("UpdateNoteHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Note updated successfully"})
 	}
 }
@@ -104,6 +108,7 @@ func (h *Handler) DeleteNoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		noteID := c.Param("noteId")
 		if noteID == "" {
+			h.logger.Error("note ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
 		}
 
@@ -115,10 +120,11 @@ func (h *Handler) DeleteNoteHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("DeleteNoteUsecase fail with error: %v", err)
+			h.logger.Error("DeleteNoteUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		}
 
+		h.logger.Info("DeleteNoteHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Note deleted successfully"})
 	}
 }
@@ -127,12 +133,13 @@ func (h *Handler) ShareNoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		noteID := c.Param("noteId")
 		if noteID == "" {
+			h.logger.Error("note ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
 		}
 
 		var req models.ShareNoteRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -147,11 +154,12 @@ func (h *Handler) ShareNoteHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("ShareNoteUsecase fail with error: %v", err)
+			h.logger.Error("ShareNoteUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("ShareNoteHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Note shared successfully"})
 	}
 }
@@ -160,11 +168,13 @@ func (h *Handler) RevokeSharingNoteHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		noteID := c.Param("noteId")
 		if noteID == "" {
+			h.logger.Error("note ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "note ID is required"})
 		}
 
 		sharedUserID := c.Param("userId")
 		if sharedUserID == "" {
+			h.logger.Error("shared user ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "shared user ID is required"})
 		}
 
@@ -177,11 +187,12 @@ func (h *Handler) RevokeSharingNoteHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("RevokeSharingNoteUsecase fail with error: %v", err)
+			h.logger.Error("RevokeNoteUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("RevokeSharingNoteHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Note sharing revoked successfully"})
 	}
 }

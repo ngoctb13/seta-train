@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -13,7 +12,7 @@ func (h *Handler) CreateFolderHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req models.CreateFolderRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -26,11 +25,12 @@ func (h *Handler) CreateFolderHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("CreateFolderUsecase fail with error: %v", err)
+			h.logger.Error("CreateFolderUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("CreateFolderHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Folder created successfully"})
 	}
 }
@@ -39,12 +39,12 @@ func (h *Handler) GetFolderDetailsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		folderID := c.Param("folderId")
 		if folderID == "" {
+			h.logger.Error("folder ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
 			return
 		}
 
 		userID, _ := c.Get(userIDKey)
-		log.Printf("GetFolderDetailsHandler has userID: %v", userID)
 
 		folder, err := h.folder.GetFolderDetails(c, &useCaseModel.GetFolderDetailsInput{
 			FolderID: folderID,
@@ -52,11 +52,12 @@ func (h *Handler) GetFolderDetailsHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("GetFolderDetailsUsecase fail with error: %v", err)
+			h.logger.Error("GetFolderDetailsUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("GetFolderDetailsHandler successfully")
 		c.JSON(http.StatusOK, folder)
 	}
 }
@@ -65,13 +66,14 @@ func (h *Handler) UpdateFolderHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req models.UpdateFolderRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
 		folderID := c.Param("folderId")
 		if folderID == "" {
+			h.logger.Error("folder ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
 			return
 		}
@@ -85,11 +87,12 @@ func (h *Handler) UpdateFolderHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("UpdateFolderUsecase fail with error: %v", err)
+			h.logger.Error("UpdateFolderUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("UpdateFolderHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Folder updated successfully"})
 	}
 }
@@ -98,6 +101,7 @@ func (h *Handler) DeleteFolderHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		folderID := c.Param("folderId")
 		if folderID == "" {
+			h.logger.Error("folder ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
 			return
 		}
@@ -110,11 +114,12 @@ func (h *Handler) DeleteFolderHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("DeleteFolderUsecase fail with error: %v", err)
+			h.logger.Error("DeleteFolderUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("DeleteFolderHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Folder deleted successfully"})
 	}
 }
@@ -123,12 +128,13 @@ func (h *Handler) ShareFolderHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		folderID := c.Param("folderId")
 		if folderID == "" {
+			h.logger.Error("folder ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
 		}
 
 		var req models.ShareFolderRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			log.Printf("binding json error: %v", err)
+			h.logger.Error("binding json error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -143,11 +149,12 @@ func (h *Handler) ShareFolderHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("ShareFolderUsecase fail with error: %v", err)
+			h.logger.Error("ShareFolderUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("ShareFolderHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Folder shared successfully"})
 	}
 }
@@ -156,11 +163,13 @@ func (h *Handler) RevokeSharingFolderHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		folderID := c.Param("folderId")
 		if folderID == "" {
+			h.logger.Error("folder ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "folder ID is required"})
 		}
 
 		sharedUserID := c.Param("userId")
 		if sharedUserID == "" {
+			h.logger.Error("shared user ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "shared user ID is required"})
 		}
 
@@ -173,11 +182,12 @@ func (h *Handler) RevokeSharingFolderHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("RevokeSharingFolderUsecase fail with error: %v", err)
+			h.logger.Error("RevokeSharingFolderUsecase fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("RevokeSharingFolderHandler successfully")
 		c.JSON(http.StatusOK, gin.H{"message": "Folder sharing revoked successfully"})
 	}
 }

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -12,6 +11,7 @@ func (h *Handler) GetAssetsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		teamID := c.Param("teamId")
 		if teamID == "" {
+			h.logger.Error("team ID is required")
 			c.JSON(http.StatusBadRequest, gin.H{"error": "team ID is required"})
 		}
 
@@ -23,11 +23,12 @@ func (h *Handler) GetAssetsHandler() gin.HandlerFunc {
 		})
 
 		if err != nil {
-			log.Printf("GetAssetsUsecase fail with error: %v", err)
+			h.logger.Error("GetAssets fail with error: %v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
+		h.logger.Info("GetAssetsHandler success")
 		c.JSON(http.StatusOK, gin.H{"assets": assets})
 	}
 }
