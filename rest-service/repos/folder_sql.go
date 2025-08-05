@@ -71,8 +71,8 @@ func (f *folderSQLRepo) GetFoldersByTeamID(ctx context.Context, teamID string) (
 
 	err = f.db.Table("folders").
 		Select("folders.id, folders.name, folders.owner_id, users.username as owner_name").
-		Joins("JOIN users ON folders.owner_id = users.id").
-		Joins("JOIN team_members ON users.id = team_members.user_id").
+		Joins("JOIN users ON folders.owner_id = users.userid").
+		Joins("JOIN team_members ON users.userid = team_members.user_id").
 		Where("team_members.team_id = ?", teamID).
 		Find(&ownedFolders).Error
 
