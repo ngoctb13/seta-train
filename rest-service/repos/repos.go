@@ -30,3 +30,7 @@ func (r *Repo) Folders() folderRepo.IFolderRepo {
 func (r *Repo) Notes() folderRepo.INoteRepo {
 	return NewNoteSQLRepo(r.db)
 }
+
+func (r *Repo) OutgoingEvents() teamRepo.IOutgoingEventRepo {
+	return NewOutgoingEventSQLRepo(r.db)
+}

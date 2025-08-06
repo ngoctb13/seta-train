@@ -1,4 +1,4 @@
-## How to start
+## How To Start
 
 Start infra - local environment
 
@@ -11,6 +11,12 @@ Start API server (include migration) - local environment
 ```bash
 ./bin.sh api start
 ```
+Start worker publish message to kafka with interval = 5s
+
+```bash
+./bin.sh api worker_start
+```
+
 
 ## Monitoring & Logging
 

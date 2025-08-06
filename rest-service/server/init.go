@@ -34,7 +34,7 @@ func (s *Server) initCORS() {
 }
 
 func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
-	team := team_usecases.NewTeam(repo.Teams(), txn)
+	team := team_usecases.NewTeam(repo.Teams(), txn, repo.OutgoingEvents())
 	folder := folder_usecases.NewFolder(repo.Folders(), repo.Notes(), txn)
 	note := folder_usecases.NewNote(repo.Notes(), repo.Folders(), txn)
 	asset := folder_usecases.NewAsset(repo.Folders(), repo.Notes(), repo.Teams(), txn)

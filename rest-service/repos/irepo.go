@@ -9,4 +9,5 @@ type IRepo interface {
 	Teams() teamRepo.ITeamRepo
 	Folders() folderRepo.IFolderRepo
 	Notes() folderRepo.INoteRepo
+	OutgoingEvents() teamRepo.IOutgoingEventRepo
 }

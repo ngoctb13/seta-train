@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
 
 	sharedModel "github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	model "github.com/ngoctb13/seta-train/rest-service/internal/domains/models"
@@ -11,14 +12,16 @@ import (
 )
 
 type Team struct {
-	teamRepo repos.ITeamRepo
-	txn      transaction.TxnManager
+	teamRepo          repos.ITeamRepo
+	outgoingEventRepo repos.IOutgoingEventRepo
+	txn               transaction.TxnManager
 }
 
-func NewTeam(teamRepo repos.ITeamRepo, txn transaction.TxnManager) *Team {
+func NewTeam(teamRepo repos.ITeamRepo, txn transaction.TxnManager, outgoingEventRepo repos.IOutgoingEventRepo) *Team {
 	return &Team{
-		teamRepo: teamRepo,
-		txn:      txn,
+		teamRepo:          teamRepo,
+		outgoingEventRepo: outgoingEventRepo,
+		txn:               txn,
 	}
 }
 
@@ -41,6 +44,27 @@ func (t *Team) CreateTeam(ctx context.Context, input *model.CreateTeamInput) err
 
 		err = t.teamRepo.AddTeamManager(ctx, &teamManagerInput)
 		if err != nil {
+			return err
+		}
+
+		payload, err := json.Marshal(map[string]interface{}{
+			"team_id":   team.ID,
+			"team_name": team.Name,
+			"user_id":   input.UserID,
+		})
+
+		if err != nil {
+			return err
+		}
+
+		outgoingEvent := &sharedModel.OutgoingEvent{
+			Topic:      "rest-service.team",
+			Key:        team.ID,
+			Payload:    payload,
+			MaxRetries: 3,
+		}
+
+		if err := t.outgoingEventRepo.CreateOutgoingEvent(ctx, outgoingEvent); err != nil {
 			return err
 		}
 
