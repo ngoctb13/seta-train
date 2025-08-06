@@ -18,12 +18,12 @@ func NewOutgoingEventSQLRepo(db *gorm.DB) *outgoingEventSQLRepo {
 func (o *outgoingEventSQLRepo) CreateOutgoingEvent(ctx context.Context, event *models.OutgoingEvent) error {
 	return o.db.WithContext(ctx).Create(event).Error
 }
-func (o *outgoingEventSQLRepo) GetPendingEvents(ctx context.Context) ([]*models.OutgoingEvent, error) {
+func (o *outgoingEventSQLRepo) GetPendingEvents(ctx context.Context, limit int) ([]*models.OutgoingEvent, error) {
 	var events []*models.OutgoingEvent
 	err := o.db.WithContext(ctx).
 		Where("is_published = false AND retry_count < max_retries").
 		Order("created_at ASC").
-		Limit(100).
+		Limit(limit).
 		Find(&events).Error
 
 	return events, err

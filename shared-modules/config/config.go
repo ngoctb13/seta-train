@@ -30,8 +30,9 @@ type KafkaConfig struct {
 
 // WorkerConfig ...
 type WorkerConfig struct {
-	Interval  int `yaml:"interval"`
-	BatchSize int `yaml:"batch_size"`
+	Interval    int `yaml:"interval"`
+	BatchSize   int `yaml:"batch_size"`
+	Concurrency int `yaml:"concurrency"`
 }
 
 // AppConfig ...

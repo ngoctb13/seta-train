@@ -14,3 +14,4 @@ kafka:
 worker:
   interval: ${INTERVAL}
   batch_size: ${BATCH_SIZE}
+  concurrency: ${CONCURRENCY}
