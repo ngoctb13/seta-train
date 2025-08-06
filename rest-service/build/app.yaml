@@ -6,3 +6,8 @@ db:
   conn_max_life_time_ms: ${DB_CONN_MAX_LIFE_TIME_MS}
   migration_conn_url: ${DB_MIGRATION_CONN_URL}
   is_dev_mode: ${DB_IS_DEV_MODE}
+kafka:
+  brokers: ${KAFKA_BROKERS}
+  group_id: ${KAFKA_GROUP_ID}
+  client_id: ${KAFKA_CLIENT_ID}
+  version: ${KAFKA_VERSION}

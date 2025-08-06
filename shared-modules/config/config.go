@@ -19,9 +19,19 @@ type PostgresConfig struct {
 	IsDevMode                  bool   `yaml:"is_dev_mode"`
 }
 
+// KafkaConfig ...
+type KafkaConfig struct {
+	Brokers  []string `yaml:"brokers"`
+	Version  string   `yaml:"version"`
+	ClientID string   `yaml:"client_id"`
+	RackID   string   `yaml:"rack_id"`
+	GroupID  string   `yaml:"group_id"`
+}
+
 // AppConfig ...
 type AppConfig struct {
-	DB *PostgresConfig `yaml:"db"`
+	DB    *PostgresConfig `yaml:"db"`
+	Kafka *KafkaConfig    `yaml:"kafka"`
 }
 
 func Load(filePath string) (*AppConfig, error) {

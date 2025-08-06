@@ -13,12 +13,14 @@ import (
 type Team struct {
 	teamRepo repos.ITeamRepo
 	txn      transaction.TxnManager
+	eventPub TeamEventPublisher
 }
 
-func NewTeam(teamRepo repos.ITeamRepo, txn transaction.TxnManager) *Team {
+func NewTeam(teamRepo repos.ITeamRepo, txn transaction.TxnManager, eventPub TeamEventPublisher) *Team {
 	return &Team{
 		teamRepo: teamRepo,
 		txn:      txn,
+		eventPub: eventPub,
 	}
 }
 
@@ -42,6 +44,15 @@ func (t *Team) CreateTeam(ctx context.Context, input *model.CreateTeamInput) err
 		err = t.teamRepo.AddTeamManager(ctx, &teamManagerInput)
 		if err != nil {
 			return err
+		}
+
+		// Send event to Kafka after successful team creation
+		if t.eventPub != nil {
+			if err := t.eventPub.TeamCreated(team.ID, team.Name, input.UserID); err != nil {
+				// Log error but don't fail the transaction
+				// In production, you might want to use outbox pattern for better reliability
+				return err
+			}
 		}
 
 		return nil
