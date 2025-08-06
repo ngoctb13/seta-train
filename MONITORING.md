@@ -1,61 +1,51 @@
-# Monitoring Stack với Grafana, Loki và Promtail
+# Monitoring Stack with Grafana, Loki and Promtail
 
-Project này đã được tích hợp với monitoring stack bao gồm:
-- **Grafana**: Platform visualization cho logs và metrics
+This project integrated monitoring stack included:
+- **Grafana**: Platform visualization for logs and metrics
 - **Loki**: Log aggregation system
 - **Promtail**: Log collection agent
 
-## Cách sử dụng
+## How to start
 
-### 1. Khởi động monitoring stack
+### 1. Start monitoring stack
 
 ```bash
 ./bin.sh monitoring start
 ```
 
-Sau khi khởi động thành công, bạn có thể truy cập:
+After starting success, we could access to:
 - **Grafana**: http://localhost:3000 (admin/admin)
 - **Loki**: http://localhost:3100
 
-### 2. Các lệnh monitoring khác
+### 2. Other monitor command
 
 ```bash
-# Dừng monitoring stack
+# Stop monitoring stack
 ./bin.sh monitoring stop
 
-# Khởi động lại
+# Restart
 ./bin.sh monitoring restart
 
-# Xem logs của monitoring stack
+# View log
 ./bin.sh monitoring logs
 
-# Xem logs của service cụ thể
+# View logs of a specific service
 ./bin.sh monitoring logs grafana
 ./bin.sh monitoring logs loki
 ./bin.sh monitoring logs promtail
 ```
 
-### 3. Khởi động toàn bộ hệ thống (infra + monitoring + API)
-
-```bash
-# Khởi động infrastructure và monitoring
-./bin.sh infra up -d
-./bin.sh monitoring start
-
-# Khởi động API services
-./bin.sh api start
-```
 
 ## Customization
 
-### Thêm service mới vào monitoring
-1. Cập nhật `build/promtail/promtail-config.yaml` để thêm job mới
-2. Tạo logger cho service mới sử dụng `utils.NewLogger()`
-3. Thêm logging middleware vào service
+### Add new service to the monitoring
+1. Update `build/promtail/promtail-config.yaml` to add new job
+2. Add logger for new service `utils.NewLogger()`
+3. Add logging middleware to the service
 
-### Tạo dashboard mới
-1. Tạo file JSON dashboard trong `build/grafana/dashboards/`
-2. Dashboard sẽ tự động được import vào Grafana
+### Add new dashboard
+1. Create dashboard JSON file in `build/grafana/dashboards/`
+2. Dashboard will automatically import into Grafana
 
-### Cấu hình retention
-Cập nhật `build/loki/loki-config.yaml` để thay đổi retention policy cho logs. 
+### Config retention
+Update `build/loki/loki-config.yaml` to change retention policy for logs. 

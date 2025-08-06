@@ -16,7 +16,7 @@ type Producer struct {
 	clientID     string
 }
 
-func NewSyncProducer(ctx context.Context, appCfg config.AppConfig, brokers []string, opts ...ProducerOption) (*Producer, error) {
+func NewSyncProducer(appCfg config.AppConfig, brokers []string, opts ...ProducerOption) (*Producer, error) {
 	log.Printf("Initializing kafka producer")
 
 	baseCfg := initBaseConfig(appCfg)

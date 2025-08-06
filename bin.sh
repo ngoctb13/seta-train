@@ -71,8 +71,15 @@ function auth_api_start() {
 function rest_api_start() {
     setup_rest_env_variables
     echo "Start rest-service config file: $REST_CONFIG_FILE"
-    ENTRY_FILE="$ROOT_DIR/seta-train/rest-service/cmd/main.go"
+    ENTRY_FILE="$ROOT_DIR/seta-train/rest-service/cmd/service/main.go"
     go run "$ENTRY_FILE" --config-file="$REST_CONFIG_FILE" --port="$REST_PORT"
+}
+
+function worker_start() {
+  setup_rest_env_variables
+  echo "Start worker config file: $REST_CONFIG_FILE"
+  ENTRY_FILE="$ROOT_DIR/seta-train/rest-service/cmd/worker/main.go"
+  go run "$ENTRY_FILE" --config-file="$REST_CONFIG_FILE"
 }
 
 function setup_auth_env_variables() {

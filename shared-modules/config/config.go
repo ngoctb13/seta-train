@@ -28,10 +28,17 @@ type KafkaConfig struct {
 	GroupID  string   `yaml:"group_id"`
 }
 
+// WorkerConfig ...
+type WorkerConfig struct {
+	Interval  int `yaml:"interval"`
+	BatchSize int `yaml:"batch_size"`
+}
+
 // AppConfig ...
 type AppConfig struct {
-	DB    *PostgresConfig `yaml:"db"`
-	Kafka *KafkaConfig    `yaml:"kafka"`
+	DB     *PostgresConfig `yaml:"db"`
+	Kafka  *KafkaConfig    `yaml:"kafka"`
+	Worker *WorkerConfig   `yaml:"worker"`
 }
 
 func Load(filePath string) (*AppConfig, error) {

@@ -1,17 +1,13 @@
 package server
 
 import (
-	"context"
-
 	"github.com/gin-contrib/cors"
 	hdl "github.com/ngoctb13/seta-train/rest-service/handler"
 	"github.com/ngoctb13/seta-train/rest-service/internal/auth"
 	folder_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/folder/usecases"
 	team_usecases "github.com/ngoctb13/seta-train/rest-service/internal/domains/team/usecases"
-	"github.com/ngoctb13/seta-train/rest-service/internal/kafka"
 	"github.com/ngoctb13/seta-train/rest-service/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/infra/transaction"
-	sharedKafka "github.com/ngoctb13/seta-train/shared-modules/kafka"
 	"github.com/ngoctb13/seta-train/shared-modules/logger"
 )
 
@@ -38,20 +34,7 @@ func (s *Server) initCORS() {
 }
 
 func (s *Server) initDomains(repo repos.IRepo, txn transaction.TxnManager) *domains {
-	// Initialize Kafka producer
-	var teamEventPub team_usecases.TeamEventPublisher
-	if s.cfg.Kafka != nil && len(s.cfg.Kafka.Brokers) > 0 {
-		producer, err := sharedKafka.NewSyncProducer(context.Background(), *s.cfg, s.cfg.Kafka.Brokers, sharedKafka.ProducerWithAutoCreateTopics())
-		if err != nil {
-			s.logger.Error("Failed to initialize Kafka producer: %v", err)
-			// Continue without Kafka producer
-		} else {
-			teamEventPub = kafka.NewTeamEventPublisher(producer)
-			// Note: In production, you should handle producer cleanup properly
-		}
-	}
-
-	team := team_usecases.NewTeam(repo.Teams(), txn, teamEventPub)
+	team := team_usecases.NewTeam(repo.Teams(), txn, repo.OutgoingEvents())
 	folder := folder_usecases.NewFolder(repo.Folders(), repo.Notes(), txn)
 	note := folder_usecases.NewNote(repo.Notes(), repo.Folders(), txn)
 	asset := folder_usecases.NewAsset(repo.Folders(), repo.Notes(), repo.Teams(), txn)

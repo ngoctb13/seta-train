@@ -11,3 +11,6 @@ kafka:
   group_id: ${KAFKA_GROUP_ID}
   client_id: ${KAFKA_CLIENT_ID}
   version: ${KAFKA_VERSION}
+worker:
+  interval: ${INTERVAL}
+  batch_size: ${BATCH_SIZE}
