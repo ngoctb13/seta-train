@@ -39,7 +39,12 @@ func main() {
 
 	// init db repo, kafka
 	repo := repos.NewSQLRepo(db, cfg.DB)
-	producer, err := kafka.NewSyncProducer(*cfg, cfg.Kafka.Brokers, kafka.ProducerWithAutoCreateTopics())
+
+	opts := []kafka.ProducerOption{
+		kafka.ProducerWithAckMode(kafka.AckModeInSync),
+		kafka.ProducerWithAutoCreateTopics(),
+	}
+	producer, err := kafka.NewSyncProducer(cfg, cfg.Kafka.Brokers, opts...)
 	if err != nil {
 		zap.S().Errorf("Init kafka producer error: %v", err)
 	}

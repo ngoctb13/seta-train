@@ -16,7 +16,7 @@ type Producer struct {
 	clientID     string
 }
 
-func NewSyncProducer(appCfg config.AppConfig, brokers []string, opts ...ProducerOption) (*Producer, error) {
+func NewSyncProducer(appCfg *config.AppConfig, brokers []string, opts ...ProducerOption) (*Producer, error) {
 	log.Printf("Initializing kafka producer")
 
 	baseCfg := initBaseConfig(appCfg)
@@ -46,7 +46,7 @@ func NewSyncProducer(appCfg config.AppConfig, brokers []string, opts ...Producer
 	return sp, nil
 }
 
-func initBaseConfig(appCfg config.AppConfig) *sarama.Config {
+func initBaseConfig(appCfg *config.AppConfig) *sarama.Config {
 	cfg := sarama.NewConfig()
 
 	// Use config from AppConfig if available
