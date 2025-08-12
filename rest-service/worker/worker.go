@@ -9,7 +9,7 @@ import (
 	"github.com/ngoctb13/seta-train/rest-service/internal/domain/models"
 	"github.com/ngoctb13/seta-train/rest-service/internal/domains/team/repos"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
-	"github.com/ngoctb13/seta-train/shared-modules/kafka"
+	"github.com/ngoctb13/seta-train/shared-modules/infra/kafka"
 )
 
 type Worker struct {

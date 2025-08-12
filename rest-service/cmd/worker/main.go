@@ -13,7 +13,7 @@ import (
 	"github.com/ngoctb13/seta-train/rest-service/worker"
 	"github.com/ngoctb13/seta-train/shared-modules/config"
 	"github.com/ngoctb13/seta-train/shared-modules/infra"
-	"github.com/ngoctb13/seta-train/shared-modules/kafka"
+	"github.com/ngoctb13/seta-train/shared-modules/infra/kafka"
 	"github.com/ngoctb13/seta-train/shared-modules/setting"
 	"go.uber.org/zap"
 )
@@ -37,7 +37,7 @@ func main() {
 		panic(err)
 	}
 
-	// init db repo, kafka
+	// init db repo, kafka producer
 	repo := repos.NewSQLRepo(db, cfg.DB)
 
 	opts := []kafka.ProducerOption{
